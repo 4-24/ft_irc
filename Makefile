@@ -1,8 +1,11 @@
-SRCS = main.cpp
+SRCS =	main.cpp \
+		Server.cpp \
+		User.cpp \
+		Socket.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
-NAME = ft_irc
+NAME = ircserv
 
 FLAGS = -std=c++98 -Wall -Wextra -Werror
 CLANG = clang++ $(FLAGS)
