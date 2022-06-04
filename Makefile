@@ -1,28 +1,32 @@
-SRCS =	main.cpp \
+NAME = ircserv
+
+CPP = c++ #-g
+
+CPPFLAGS = -std=c++98 -Wall -Wextra -Werror
+
+SRC_NAME =	main.cpp \
 		Server.cpp \
 		User.cpp \
 		Socket.cpp
 
-OBJS = $(SRCS:.cpp=.o)
-
-NAME = ircserv
-
-FLAGS = -std=c++98 -Wall -Wextra -Werror
-CLANG = clang++ $(FLAGS)
+OBJ = $(SRC_NAME:.cpp=.o)
 
 RM = rm -f
 
-all:		$(NAME)
+%.o : %.cpp
+	$(CPP) $(CPPFLAGS) -c $< -o $@
 
-$(NAME):	$(OBJS)
-			$(CLANG) $(OBJS) -o $(NAME)
+$(NAME) : $(OBJ)
+	$(CPP) -o $(NAME) $(OBJ) $(CPPFLAGS)
 
-clean:
-			$(RM) $(OBJS)
+all : $(NAME)
 
-fclean:		clean
-			$(RM) $(NAME)
+clean	:
+	rm -rf $(OBJ)
 
-re:			fclean all
+fclean	: clean
+	rm -rf $(NAME)
 
-.PHONY:		all clean fclean re
+re		: fclean all
+
+.PHONY: all clean fclean re
