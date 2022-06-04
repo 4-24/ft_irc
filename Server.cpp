@@ -18,7 +18,7 @@ void	Server::start()
 		{
 			for (size_t i = 0; i < _user_fds.size(); i++)
 			{
-				if (_user_fds[i].revents & POLLIN) // //클라이언트 소켓에서 POLLIN 이벤트가 발생한 경우
+				if (_user_fds[i].revents & POLLIN) // 클라이언트 소켓에서 POLLIN 이벤트가 발생한 경우
 				{
 					int fd = _user_fds[i].fd;
 					User &user = find_user(fd);
@@ -62,19 +62,15 @@ void	Server::chat(User &user)
 
 	std::memset(buff, 0, sizeof buff);
 	int nbytes;
-	if ((nbytes = recv(user.get_fd(), buff, sizeof buff, 0)) <= 0)
-	{
-		if (nbytes == 0) // recv() 반환값이 0이라면 이는 클라이언트에서 접속을 끊은 것
-			std::cout << "server: socket " << user.get_fd() << " hung up" << std::endl;
-		else
-			throw std::runtime_error("recv");
-		close(user.get_fd()); // 연결 종료
-	}
+	if ((nbytes = recv(user.get_fd(), buff, sizeof buff, 0)) < 0)
+		throw std::runtime_error("recv");
 	else
 	{
 		buff[nbytes] = 0;
 		info += buff;
 		std::cout << "server: socket " << user.get_fd() << " says " << info << std::endl;
+		if (send(user.get_fd(), info.c_str(), info.size(), 0) < 0)
+			throw std::runtime_error("send");
 		if (info.find("\n\r") != std::string::npos)
 		{
 			for (size_t i = 0; i < _user_fds.size(); i++)
