@@ -24,7 +24,6 @@ class Server
 	private:
 		int								_port;
 		int								server_socket;
-		int								_max_fd;
 		std::vector<User *>				_users;
 		Socket							*_socket;
 		std::vector<struct pollfd>		_user_fds;

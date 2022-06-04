@@ -2,7 +2,6 @@
 
 Server::Server(int port) {
 	_port = port;
-	_max_fd = 1;
 	_socket = new Socket(port);
 }
 
@@ -80,7 +79,7 @@ void	Server::chat(User &user)
 		std::cout << "server: socket " << user.get_fd() << " says " << info << "\n";
 		if (info.find("\n\r") != std::string::npos)
 		{
-			//TODO: execute command
+			//TODO: execute command 구현
 			info.clear();
 		}
 	}
