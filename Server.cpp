@@ -14,9 +14,7 @@ void	Server::start()
 
 	while (1)
 	{
-		int res = poll(_fds.data(), _fds.size(), TIMEOUT);
-
-		if (res > 0)
+		if (int res = poll(_fds.data(), _fds.size(), TIMEOUT))
 		{
 			if (_fds[0].revents & POLLIN) // 서버 소켓에서 POLLIN 이벤트가 발생한 경우
 			{
