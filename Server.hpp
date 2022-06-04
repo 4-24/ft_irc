@@ -26,14 +26,14 @@ class Server
 		int								server_socket;
 		std::vector<User *>				_users;
 		Socket							*_socket;
-		std::vector<struct pollfd>		_user_fds;
+		std::vector<struct pollfd>		_fds;
 
 	public:
 		Server(int port);
 		~Server();
 		void							start();
-		void							create_poll(int connect);
-		User							&find_user(int connect);
+		void							create_poll(int fd, bool is_server);
+		User							&find_user(int fd);
 		void							chat(User &user);
 };
 

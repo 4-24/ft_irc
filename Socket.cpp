@@ -77,3 +77,8 @@ int	Socket::get_connect()
 {
 	return (_connect);
 }
+
+int	Socket::get_listen()
+{
+	return (_listen);
+}

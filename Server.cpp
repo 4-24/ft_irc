@@ -9,47 +9,52 @@ Server::~Server() {}
 
 void	Server::start()
 {
-	int status;
-
 	_socket->create();
+	create_poll(_socket->get_listen(), true);
+
 	while (1)
 	{
-		if ((status = poll(_user_fds.data(), _user_fds.size(), TIMEOUT)) != -1)
+		int res = poll(_fds.data(), _fds.size(), TIMEOUT);
+
+		if (res > 0)
 		{
-			for (size_t i = 0; i < _user_fds.size(); i++)
+			if (_fds[0].revents & POLLIN) // 서버 소켓에서 POLLIN 이벤트가 발생한 경우
 			{
-				if (_user_fds[i].revents & POLLIN) // 클라이언트 소켓에서 POLLIN 이벤트가 발생한 경우
+				_socket->allow();
+				create_poll(_socket->get_connect(), false);
+				std::cout << "User connected: " << _socket->get_connect() << std::endl;
+			}
+			for (size_t i = 1; i < _fds.size(); i++)
+			{
+				if (_fds[i].revents & POLLIN) // 클라이언트 소켓에서 POLLIN 이벤트가 발생한 경우
 				{
-					int fd = _user_fds[i].fd;
+					int fd = _fds[i].fd;
 					User &user = find_user(fd);
 					chat(user);
-					_user_fds[i].revents = 0;
+					_fds[i].revents = 0;
 				}
 			}
 		}
-		_socket->allow();
-		create_poll(_socket->get_connect());
 	}
 }
 
-void	Server::create_poll(int connect)
+void	Server::create_poll(int fd, bool is_server)
 {
 	struct pollfd pf;
 
-	if (connect > 0)
-	{
-		pf.fd = connect;
-		pf.events = POLLIN;
-		pf.revents = 0;
-		_user_fds.push_back(pf);
-		_users.push_back(new User(connect));
-	}
+	pf.fd = fd;
+	pf.events = POLLIN;
+	pf.revents = 0;
+	_fds.push_back(pf);
+
+	if (!is_server)
+		_users.push_back(new User(fd));
 }
 
-User &Server::find_user(int connect)
+User &Server::find_user(int fd)
 {
-	for (size_t i = 0; i < _users.size(); i++)
-		if (_users[i]->get_fd() == connect)
+	for (size_t i = 1; i < _users.size(); i++)
+		if (_users[i]->get_fd() == fd)
 			return *_users[i];
 
 	return *_users[0];
@@ -68,14 +73,13 @@ void	Server::chat(User &user)
 	{
 		buff[nbytes] = 0;
 		info += buff;
-		std::cout << "server: socket " << user.get_fd() << " says " << info << std::endl;
-		if (send(user.get_fd(), info.c_str(), info.size(), 0) < 0)
-			throw std::runtime_error("send");
+		//std::cout << "server: socket " << user.get_fd() << " says " << buff << std::endl;
+		//for (size_t i = 1; i < _fds.size(); i++)
+		//		if (_fds[i].fd != user.get_fd())
+		//			if (send(_fds[i].fd, buff, nbytes, 0) < 0)
+		//				throw std::runtime_error("send");
 		if (info.find("\n\r") != std::string::npos)
 		{
-			for (size_t i = 0; i < _user_fds.size(); i++)
-				if (_user_fds[i].fd != user.get_fd())
-					send(_user_fds[i].fd, info.c_str(), info.size(), 0);
 			//TODO: execute command 구현
 			info.clear();
 		}
