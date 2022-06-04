@@ -32,7 +32,7 @@ class Server
 		Server(int port);
 		~Server();
 		void							start();
-		int								create_poll(int connect);
+		void							create_poll(int connect);
 		User							&find_user(int connect);
 		void							chat(User &user);
 };
