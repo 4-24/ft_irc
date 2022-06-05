@@ -44,37 +44,61 @@ void	Server::execute(User &user, Message message)
 }
 
 void	Server::cmd_pass(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_nick(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_user(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_oper(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_mode(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_join(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_kick(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_part(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_names(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_privmsg(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_notice(int user_fd, std::vector<std::string> params)
-{}
+{
+	(void)user_fd, (void)params; //TODO: Implement this
+}
 
 void	Server::cmd_quit(int user_fd)
-{}
+{
+	(void)user_fd; //TODO: Implement this
+}
