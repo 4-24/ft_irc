@@ -9,9 +9,11 @@ User::User(int fd)
 
 User::~User() {}
 
-void	User::send_message(std::string message)
+void	User::add_message(std::string message)
 {
-	_message.setup(message);
+	Message m = Message();
+	m.setup(message);
+	_message = m;
 
 	std::cout << "------------------------------------" << std::endl;
 	std::cout << "Message from User " << _fd << std::endl;
@@ -19,7 +21,13 @@ void	User::send_message(std::string message)
 	std::cout << "message: " << message;
 	std::cout << "prefix: " << _message.get_prefix() << std::endl;
 	std::cout << "command: " << _message.get_command() << std::endl;
-	std::cout << "parameter[0]: " << *(_message.get_params().begin()) << std::endl;
+	if (_message.get_params().size() > 0)
+	{
+		std::cout << "params: ";
+		for (unsigned long i = 0; i < _message.get_params().size(); i++)
+			std::cout << _message.get_params()[i] << " ";
+		std::cout << std::endl;
+	}
 }
 
 bool	User::is_registered()
@@ -40,4 +48,14 @@ int	User::get_fd() const
 Message	User::get_message() const
 {
 	return (_message);
+}
+
+void	User::set_authenticated(bool authenticated)
+{
+	_is_authenticated = authenticated;
+}
+
+void	User::set_registered(bool registered)
+{
+	_is_registered = registered;
 }

@@ -25,12 +25,14 @@ class Server
 	private:
 		int								_port;
 		int								server_socket;
+		std::string						_password;
 		std::vector<User *>				_users;
 		Socket							*_socket;
 		std::vector<struct pollfd>		_fds;
 
 	public:
 		Server(int port);
+		Server(int port, std::string password);
 		~Server();
 		void							start();
 		void							create_poll(int fd, bool is_server);
@@ -38,7 +40,10 @@ class Server
 		void							chat(User &user);
 		void							execute(User &user, Message message);
 
-		void	cmd_pass(int user_fd, std::vector<std::string> params);
+		void							send_msg(int fd, std::string message);
+		void							send_err(int fd, std::string error);
+
+		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(int user_fd, std::vector<std::string> params);
 		void	cmd_user(int user_fd, std::vector<std::string> params);
 		void	cmd_oper(int user_fd, std::vector<std::string> params);

@@ -10,11 +10,11 @@ void	Server::execute(User &user, Message message)
 	try
 	{
 		if (command == "PASS")
-			cmd_pass(fd, params);
-		else if (!user.is_authenticated())
-			throw std::runtime_error("unauthenticated user. stop.\n");
-		if (!user.is_registered() && command != "NICK" && command != "USER")
-			throw std::runtime_error("register first\n");
+			cmd_pass(user, params);
+		else if (_password != "" && !user.is_authenticated())
+			send_err(fd, "unauthenticated user. stop.\n");
+		else if (!user.is_registered() && command != "NICK" && command != "USER")
+			send_err(fd, "register first\n");
 		else if (command == "NICK")
 			cmd_nick(fd, params);
 		else if (command == "USER")
@@ -36,7 +36,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "QUIT")
 			cmd_quit(fd);
 		else
-			throw std::runtime_error("command not found\n");
+			send_err(fd, "command not found\n");
 	}
 	catch (std::runtime_error &e)
 	{
@@ -44,9 +44,26 @@ void	Server::execute(User &user, Message message)
 	}
 }
 
-void	Server::cmd_pass(int user_fd, std::vector<std::string> params)
+void	Server::send_msg(int fd, std::string message)
 {
-	(void)user_fd, (void)params; //TODO: Implement this
+	write(fd, message.c_str(), message.size());
+}
+
+void	Server::send_err(int fd, std::string error)
+{
+	write(fd, error.c_str(), error.size());
+	throw std::runtime_error(error.c_str());
+}
+
+void	Server::cmd_pass(User &user, std::vector<std::string> params)
+{
+	if (params.size() == 1)
+	{
+		if (params[0] == _password)
+			user.set_authenticated(true);
+		else
+			send_err(user.get_fd(), "password incorrect\n");
+	}
 }
 
 void	Server::cmd_nick(int user_fd, std::vector<std::string> params)

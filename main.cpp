@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv)
 {
-	if (argc == 2) // argc == 3일때 에러 핸들링 (TODO// ./ircserv port password)
+	if (argc == 2)
 	{
 		std::stringstream ss;
 		ss << argv[1];
@@ -10,6 +10,18 @@ int main(int argc, char **argv)
 		ss >> num;
 
 		Server server(num);
+		server.start();
+		return 0;
+	}
+	else if (argc == 3)
+	{
+		std::stringstream ss;
+		ss << argv[1];
+		int num;
+		ss >> num;
+		std::string password = argv[2];
+
+		Server server(num, password);
 		server.start();
 		return 0;
 	}

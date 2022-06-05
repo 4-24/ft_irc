@@ -17,10 +17,13 @@ class User
 		User(int fd);
 		~User();
 
-		void		send_message(std::string message);
+		void		add_message(std::string message);
 
 		bool		is_registered();
 		bool		is_authenticated();
+
+		void		set_authenticated(bool authenticated);
+		void		set_registered(bool registered);
 		int			get_fd() const;
 		Message		get_message() const;
 };

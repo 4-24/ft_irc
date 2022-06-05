@@ -2,6 +2,13 @@
 
 Server::Server(int port) {
 	_port = port;
+	_password = "";
+	_socket = new Socket(port);
+}
+
+Server::Server(int port, std::string password) {
+	_port = port;
+	_password = password;
 	_socket = new Socket(port);
 }
 
@@ -46,7 +53,11 @@ void	Server::create_poll(int fd, bool is_server)
 	_fds.push_back(pf);
 
 	if (!is_server)
+	{
 		_users.push_back(new User(fd));
+		if (_password != "")
+			send_msg(fd, "Please enter ircserv password. \n");
+	}
 }
 
 User &Server::find_user(int fd)
@@ -73,7 +84,7 @@ void	Server::chat(User &user)
 		info += buff;
 		if (info.find("\r\n") != std::string::npos)
 		{
-			user.send_message(info);
+			user.add_message(info);
 			execute(user, user.get_message());
 			//TODO: execute command 구현
 			info.clear();
