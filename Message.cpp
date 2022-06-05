@@ -25,6 +25,8 @@ void	Message::set_params(std::vector<std::string> params)
 
 }
 
-std::string		Message::get_prefix() const {}
-std::string		Message::get_command() const {}
+std::string					Message::get_prefix() const {}
+
+std::string					Message::get_command() const {}
+
 std::vector<std::string>	Message::get_params() const {}
