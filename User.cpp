@@ -11,9 +11,7 @@ User::~User() {}
 
 void	User::add_message(std::string message)
 {
-	Message m = Message();
-	m.setup(message);
-	_message = m;
+	_message.setup(message);
 
 	std::cout << "------------------------------------" << std::endl;
 	std::cout << "Message from User " << _fd << std::endl;
