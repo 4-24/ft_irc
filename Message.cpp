@@ -50,6 +50,8 @@ void	Message::parse_command(std::string message, int &i)
 		i++;
 	if (i > j)
 		_command.append(&message[j], i - j);
+	if (!_command.empty())
+		std::transform(_command.begin(), _command.end(), _command.begin(), ::toupper);
 }
 
 void	Message::parse_params(std::string message, int &i)

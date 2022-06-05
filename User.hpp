@@ -6,8 +6,11 @@
 class User
 {
 	private:
-		int		_fd;
-		Message	_message;
+		int			_fd;
+		Message		_message;
+		bool		_is_registered;
+		std::string	_nickname;
+		std::string	_username;
 
 	public:
 		User(int fd);
@@ -15,6 +18,7 @@ class User
 
 		void		send_message(std::string message);
 
+		bool		is_registered();
 		int			get_fd() const;
 		Message		get_message() const;
 };

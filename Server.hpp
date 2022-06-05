@@ -20,7 +20,6 @@
 
 # define TIMEOUT 1000
 
-
 class Server
 {
 	private:
@@ -38,6 +37,19 @@ class Server
 		User							&find_user(int fd);
 		void							chat(User &user);
 		void							execute(User &user, Message message);
+
+		void	cmd_pass(int user_fd, std::vector<std::string> params);
+		void	cmd_nick(int user_fd, std::vector<std::string> params);
+		void	cmd_user(int user_fd, std::vector<std::string> params);
+		void	cmd_oper(int user_fd, std::vector<std::string> params);
+		void	cmd_mode(int user_fd, std::vector<std::string> params);
+		void	cmd_join(int user_fd, std::vector<std::string> params);
+		void	cmd_kick(int user_fd, std::vector<std::string> params);
+		void	cmd_part(int user_fd, std::vector<std::string> params);
+		void	cmd_names(int user_fd, std::vector<std::string> params);
+		void	cmd_privmsg(int user_fd, std::vector<std::string> params);
+		void	cmd_notice(int user_fd, std::vector<std::string> params);
+		void	cmd_quit(int user_fd);
 };
 
 #endif

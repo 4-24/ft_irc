@@ -17,6 +17,11 @@ void	User::send_message(std::string message)
 	std::cout << "parameter[0]: " << *(_message.get_params().begin()) << std::endl;
 }
 
+bool	User::is_registered()
+{
+	return _is_registered;
+}
+
 int	User::get_fd() const
 {
 	return (_fd);
