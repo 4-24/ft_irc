@@ -122,5 +122,6 @@ void	Server::cmd_notice(int user_fd, std::vector<std::string> params)
 void	Server::cmd_quit(int user_fd)
 {
 	send_msg(user_fd, "Goodbye!");
+	//TODO: _users, _fds에서 해당 fd를 삭제하고 close()
 	close(user_fd);
 }
