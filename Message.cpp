@@ -1,6 +1,6 @@
 # include "Message.hpp"
 
-Message::Message(std::string message) {}
+Message::Message() {}
 
 Message::~Message() {}
 
