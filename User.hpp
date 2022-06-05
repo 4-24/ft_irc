@@ -1,16 +1,22 @@
 #ifndef USER_HPP
 # define USER_HPP
 
+# include "Message.hpp"
+
 class User
 {
 	private:
-		int	_fd;
+		int		_fd;
+		Message	_message;
 
 	public:
 		User(int fd);
 		~User();
 
-		int								get_fd() const;
+		void		send_message(std::string message);
+
+		int			get_fd() const;
+		Message		get_message() const;
 };
 
 #endif

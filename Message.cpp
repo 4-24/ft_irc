@@ -1,13 +1,10 @@
 # include "Message.hpp"
 
-Message::Message(std::string message)
-{
-	setup(message);
-}
+Message::Message(std::string message) {}
 
 Message::~Message() {}
 
-bool	Message::is_end(std::string message)
+bool	Message::has_end(std::string message)
 {
 	int	i;
 
@@ -25,7 +22,7 @@ void	Message::setup(std::string message)
 	int	i;
 
 	i = 0;
-	if (is_end(message))
+	if (has_end(message))
 	{
 		if (message[i] == ':')
 			parse_prefix(message, i);

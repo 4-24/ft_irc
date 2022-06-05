@@ -74,7 +74,7 @@ void	Server::chat(User &user)
 		if (info.find("\r\n") != std::string::npos)
 		{
 			std::cout << info << std::endl;
-			Message message(info);
+			user.send_message(info);
 			//TODO: execute command 구현
 			info.clear();
 		}

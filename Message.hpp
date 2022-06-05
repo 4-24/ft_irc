@@ -13,7 +13,7 @@ class Message
 		std::vector<std::string>	_params;
 
 	public:
-		Message(std::string message);
+		Message();
 		~Message();
 
 		void						setup(std::string message);
