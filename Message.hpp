@@ -17,7 +17,7 @@ class Message
 		~Message();
 
 		void						setup(std::string message);
-		bool						is_end(std::string message);
+		bool						has_end(std::string message);
 		void						parse_prefix(std::string message, int &i);
 		void						parse_command(std::string message, int &i);
 		void						parse_params(std::string message, int &i);
