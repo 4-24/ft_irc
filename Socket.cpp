@@ -69,7 +69,6 @@ void	Socket::allow()
 			throw std::runtime_error("accept");
 			exit(5);
 		}
-	std::cout << "User connected: " << _connect << std::endl;
 }
 
 

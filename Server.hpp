@@ -16,6 +16,8 @@
 
 # include "User.hpp"
 # include "Socket.hpp"
+# include "Message.hpp"
+
 # define TIMEOUT 1000
 
 

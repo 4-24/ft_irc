@@ -1,7 +1,8 @@
 SRCS =	main.cpp \
 		Server.cpp \
 		User.cpp \
-		Socket.cpp
+		Socket.cpp \
+		Message.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

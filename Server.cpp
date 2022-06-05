@@ -71,13 +71,10 @@ void	Server::chat(User &user)
 	{
 		buff[nbytes] = 0;
 		info += buff;
-		//std::cout << "server: socket " << user.get_fd() << " says " << buff << std::endl;
-		//for (size_t i = 1; i < _fds.size(); i++)
-		//		if (_fds[i].fd != user.get_fd())
-		//			if (send(_fds[i].fd, buff, nbytes, 0) < 0)
-		//				throw std::runtime_error("send");
-		if (info.find("\n\r") != std::string::npos)
+		if (info.find("\r\n") != std::string::npos)
 		{
+			std::cout << info << std::endl;
+			Message message(info);
 			//TODO: execute command 구현
 			info.clear();
 		}
