@@ -9,6 +9,7 @@ class User
 		int			_fd;
 		Message		_message;
 		bool		_is_registered;
+		bool		_is_authenticated;
 		std::string	_nickname;
 		std::string	_username;
 
