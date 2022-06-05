@@ -9,11 +9,12 @@ void	Server::execute(User &user, Message message)
 
 	try
 	{
-		if (!user.is_registered() && command != "PASS" \
-									&& command != "NICK" && command != "USER")
-			throw std::runtime_error("register first\n");
 		if (command == "PASS")
 			cmd_pass(fd, params);
+		else if (!user.is_authenticated())
+			throw std::runtime_error("unauthenticated user. stop.\n");
+		if (!user.is_registered() && command != "NICK" && command != "USER")
+			throw std::runtime_error("register first\n");
 		else if (command == "NICK")
 			cmd_nick(fd, params);
 		else if (command == "USER")

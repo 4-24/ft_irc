@@ -27,6 +27,11 @@ bool	User::is_registered()
 	return _is_registered;
 }
 
+bool	User::is_authenticated()
+{
+	return _is_authenticated;
+}
+
 int	User::get_fd() const
 {
 	return (_fd);

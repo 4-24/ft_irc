@@ -20,6 +20,7 @@ class User
 		void		send_message(std::string message);
 
 		bool		is_registered();
+		bool		is_authenticated();
 		int			get_fd() const;
 		Message		get_message() const;
 };
