@@ -73,16 +73,10 @@ void	Server::chat(User &user)
 		info += buff;
 		if (info.find("\r\n") != std::string::npos)
 		{
-			std::cout << info << std::endl;
 			user.send_message(info);
 			execute(user, user.get_message());
 			//TODO: execute command 구현
 			info.clear();
 		}
 	}
-}
-
-void	Server::execute(User &user, Message message)
-{
-
 }
