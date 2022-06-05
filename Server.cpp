@@ -56,7 +56,7 @@ void	Server::create_poll(int fd, bool is_server)
 	{
 		_users.push_back(new User(fd));
 		if (_password != "")
-			send_msg(fd, "Please enter ircserv password. \n");
+			send_msg(fd, "Please enter ircserv password.");
 	}
 }
 

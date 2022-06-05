@@ -9,12 +9,14 @@ void	Server::execute(User &user, Message message)
 
 	try
 	{
-		if (command == "PASS")
+		if (command == "QUIT")
+			cmd_quit(fd);
+		else if (command == "PASS")
 			cmd_pass(user, params);
 		else if (_password != "" && !user.is_authenticated())
-			send_err(fd, "unauthenticated user. stop.\n");
+			send_err(fd, "unauthenticated user. stop.");
 		else if (!user.is_registered() && command != "NICK" && command != "USER")
-			send_err(fd, "register first\n");
+			send_err(fd, "register first");
 		else if (command == "NICK")
 			cmd_nick(fd, params);
 		else if (command == "USER")
@@ -33,10 +35,8 @@ void	Server::execute(User &user, Message message)
 			cmd_names(fd, params);
 		else if (command == "PRIVMSG" || command == "NOTICE")
 			cmd_privmsg(fd, params);
-		else if (command == "QUIT")
-			cmd_quit(fd);
 		else
-			send_err(fd, "command not found\n");
+			send_err(fd, "command not found");
 	}
 	catch (std::runtime_error &e)
 	{
@@ -46,13 +46,13 @@ void	Server::execute(User &user, Message message)
 
 void	Server::send_msg(int fd, std::string message)
 {
-	write(fd, message.c_str(), message.size());
+	write(fd, (GREEN + message + RESET + "\n").c_str(), message.size() + 13);
 }
 
 void	Server::send_err(int fd, std::string error)
 {
-	write(fd, error.c_str(), error.size());
-	throw std::runtime_error(error.c_str());
+	write(fd, (YELLOW + error + RESET + "\n").c_str(), error.size() + 11);
+	throw std::runtime_error((error + "\n").c_str());
 }
 
 void	Server::cmd_pass(User &user, std::vector<std::string> params)
@@ -60,9 +60,12 @@ void	Server::cmd_pass(User &user, std::vector<std::string> params)
 	if (params.size() == 1)
 	{
 		if (params[0] == _password)
+		{
 			user.set_authenticated(true);
+			send_msg(user.get_fd(), "Authenticated...");
+		}
 		else
-			send_err(user.get_fd(), "password incorrect\n");
+			send_err(user.get_fd(), "password incorrect");
 	}
 }
 
@@ -118,5 +121,6 @@ void	Server::cmd_notice(int user_fd, std::vector<std::string> params)
 
 void	Server::cmd_quit(int user_fd)
 {
-	(void)user_fd; //TODO: Implement this
+	send_msg(user_fd, "Goodbye!");
+	close(user_fd);
 }
