@@ -46,12 +46,12 @@ void	Server::execute(User &user, Message message)
 
 void	Server::send_msg(int fd, std::string message)
 {
-	write(fd, (GREEN + message + RESET + "\n").c_str(), message.size() + 13);
+	send(fd, (GREEN + message + RESET + "\n").c_str(), message.size() + 13, 0);
 }
 
 void	Server::send_err(int fd, std::string error)
 {
-	write(fd, (YELLOW + error + RESET + "\n").c_str(), error.size() + 11);
+	send(fd, (YELLOW + error + RESET + "\n").c_str(), error.size() + 11, 0);
 	throw std::runtime_error((error + "\n").c_str());
 }
 
