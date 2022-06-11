@@ -71,32 +71,27 @@ User &Server::find_user(int fd)
 
 void	Server::chat(User &user)
 {
-	std::string info;
-	char buff[100];
+	std::string	info;
+	char		buff[100];
+	int			nbytes;
 
 	std::memset(buff, 0, sizeof buff);
-	int nbytes;
-	while ((nbytes = recv(user.get_fd(), buff, sizeof buff, 0)) > 0)
+	if ((nbytes = recv(user.get_fd(), buff, sizeof buff, 0)) > 0)
 	{
 		buff[nbytes] = 0;
 		info += buff;
 		buff[0] = 0;
-		if (info.find('\n') != std::string::npos)
-			break;
+		if (info.find("\n") != std::string::npos)
+		{
+			info.replace(info.find("\n"), 2, "\r\n");
+			user.add_message(info);
+			execute(user, user.get_message());
+			info.clear();
+		}
 	}
-	if (nbytes == 0)
-		throw std::runtime_error("recv");
-	if (info.length() > 512)
-		info = info.substr(0, 510) + "\r\n";
 	else
 	{
-		while (info.find("\n") != std::string::npos)
-			info.replace(info.find("\n"), 1, "\r");
-		info += "\n";
-	}
-	{
-		user.add_message(info);
-		execute(user, user.get_message());
-		info.clear();
+		throw std::runtime_error("recv");
+		exit(1);
 	}
 }
