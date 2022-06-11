@@ -76,18 +76,27 @@ void	Server::chat(User &user)
 
 	std::memset(buff, 0, sizeof buff);
 	int nbytes;
-	if ((nbytes = recv(user.get_fd(), buff, sizeof buff, 0)) < 0)
-		throw std::runtime_error("recv");
-	else
+	while ((nbytes = recv(user.get_fd(), buff, sizeof buff, 0)) > 0)
 	{
 		buff[nbytes] = 0;
 		info += buff;
-		if (info.find("\r\n") != std::string::npos)
-		{
-			user.add_message(info);
-			execute(user, user.get_message());
-			//TODO: execute command 구현
-			info.clear();
-		}
+		buff[0] = 0;
+		if (info.find('\n') != std::string::npos)
+			break;
+	}
+	if (nbytes == 0)
+		throw std::runtime_error("recv");
+	if (info.length() > 512)
+		info = info.substr(0, 510) + "\r\n";
+	else
+	{
+		while (info.find("\n") != std::string::npos)
+			info.replace(info.find("\n"), 1, "\r");
+		info += "\n";
+	}
+	{
+		user.add_message(info);
+		execute(user, user.get_message());
+		info.clear();
 	}
 }
