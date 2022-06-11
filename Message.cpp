@@ -4,31 +4,15 @@ Message::Message() {}
 
 Message::~Message() {}
 
-bool	Message::has_end(std::string message)
-{
-	int	i;
-
-	i = 0;
-	while (message[i] && message[i] != '\r' && i < 510)
-		i++;
-	if (message[i] == '\r' && message[i + 1] == '\n')
-		return true;
-	else
-		return false;
-}
-
 void	Message::setup(std::string message)
 {
 	int	i;
 
 	i = 0;
-	if (has_end(message))
-	{
-		if (message[i] == ':')
-			parse_prefix(message, i);
-		parse_command(message, i);
-		parse_params(message, i);
-	}
+	if (message[i] == ':')
+		parse_prefix(message, i);
+	parse_command(message, i);
+	parse_params(message, i);
 }
 
 void	Message::parse_prefix(std::string message, int &i)

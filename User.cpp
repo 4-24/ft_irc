@@ -9,14 +9,28 @@ User::User(int fd)
 
 User::~User() {}
 
-void	User::add_message(std::string message)
+void	User::add_buffer(std::string message)
 {
-	_message.setup(message);
+	_buffer += message;
 
 	std::cout << "------------------------------------" << std::endl;
 	std::cout << "Message from User " << _fd << std::endl;
 	std::cout << "------------------------------------" << std::endl;
-	std::cout << "message: " << message;
+	std::cout << "message: " << _buffer << std::endl;
+	std::cout << "------------------------------------" << std::endl;
+}
+
+void	User::clear_message()
+{
+	_buffer.clear();
+	_message = Message();
+}
+
+void	User::setup_message()
+{
+	_buffer.replace(_buffer.find("\n"), 2, "\r\n");
+	_message.setup(_buffer);
+
 	std::cout << "prefix: " << _message.get_prefix() << std::endl;
 	std::cout << "command: " << _message.get_command() << std::endl;
 	if (_message.get_params().size() > 0)
@@ -36,6 +50,11 @@ bool	User::is_registered()
 bool	User::is_authenticated()
 {
 	return _is_authenticated;
+}
+
+std::string	User::get_buffer() const
+{
+	return _buffer;
 }
 
 int	User::get_fd() const
