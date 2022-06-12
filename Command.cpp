@@ -10,7 +10,7 @@ void	Server::execute(User &user, Message message)
 	try
 	{
 		if (command == "QUIT")
-			cmd_quit(fd);
+			quit(fd);
 		else if (command == "PASS")
 			cmd_pass(user, params);
 		else if (_password != "" && !user.is_authenticated())
@@ -119,9 +119,20 @@ void	Server::cmd_notice(int user_fd, std::vector<std::string> params)
 	(void)user_fd, (void)params; //TODO: Implement this
 }
 
-void	Server::cmd_quit(int user_fd)
+void	Server::quit(int user_fd)
 {
 	send_msg(user_fd, "Goodbye!");
-	//TODO: _users, _fds에서 해당 fd를 삭제하고 close()
 	close(user_fd);
+	std::cout << "User " << user_fd << " disconnected." << std::endl;
+
+	std::cout << "Users current: " << _users.size() << std::endl;
+	std::cout << "Fds current: " << _fds.size() << std::endl;
+
+	int i = find_user_idx(user_fd);
+	delete *(_users.begin() + i);
+	std::cout << "deleted user: " << user_fd << std::endl;
+	_users.erase(_users.begin() + i);
+	std::cout << "Users left: " << _users.size() << std::endl;
+	_fds.erase(_fds.begin() + i);
+	std::cout << "Fds left: " << _fds.size() << std::endl;
 }

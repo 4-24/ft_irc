@@ -69,6 +69,15 @@ User &Server::find_user(int fd)
 	return *_users[0];
 }
 
+int	Server::find_user_idx(int fd)
+{
+	for (size_t i = 1; i < _users.size(); i++)
+		if (_users[i]->get_fd() == fd)
+			return i;
+
+	return -1;
+}
+
 void	Server::chat(User &user)
 {
 	char		buff[MSG_LEN];

@@ -42,6 +42,7 @@ class Server
 		void							start();
 		void							create_poll(int fd, bool is_server);
 		User							&find_user(int fd);
+		int								find_user_idx(int fd);
 		void							chat(User &user);
 		void							execute(User &user, Message message);
 
@@ -59,7 +60,8 @@ class Server
 		void	cmd_names(int user_fd, std::vector<std::string> params);
 		void	cmd_privmsg(int user_fd, std::vector<std::string> params);
 		void	cmd_notice(int user_fd, std::vector<std::string> params);
-		void	cmd_quit(int user_fd);
+
+		void	quit(int user_fd);
 };
 
 #endif
