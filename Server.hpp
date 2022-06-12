@@ -51,18 +51,18 @@ class Server
 		void							send_err(int fd, std::string error);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
-		void	cmd_nick(int user_fd, std::vector<std::string> params);
-		void	cmd_user(int user_fd, std::vector<std::string> params);
-		void	cmd_oper(int user_fd, std::vector<std::string> params);
-		void	cmd_mode(int user_fd, std::vector<std::string> params);
-		void	cmd_join(int user_fd, std::vector<std::string> params);
-		void	cmd_kick(int user_fd, std::vector<std::string> params);
-		void	cmd_part(int user_fd, std::vector<std::string> params);
-		void	cmd_names(int user_fd, std::vector<std::string> params);
-		void	cmd_privmsg(int user_fd, std::vector<std::string> params);
-		void	cmd_notice(int user_fd, std::vector<std::string> params);
+		void	cmd_nick(int fd, std::vector<std::string> params);
+		void	cmd_user(int fd, std::vector<std::string> params);
+		void	cmd_oper(int fd, std::vector<std::string> params);
+		void	cmd_mode(int fd, std::vector<std::string> params);
+		void	cmd_join(int fd, std::vector<std::string> params);
+		void	cmd_kick(int fd, std::vector<std::string> params);
+		void	cmd_part(int fd, std::vector<std::string> params);
+		void	cmd_names(int fd, std::vector<std::string> params);
+		void	cmd_privmsg(int fd, std::vector<std::string> params);
+		void	cmd_notice(int fd, std::vector<std::string> params);
 
-		void	quit(int user_fd);
+		void	quit(int fd);
 };
 
 #endif
