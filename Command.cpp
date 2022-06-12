@@ -128,13 +128,20 @@ void	Server::cmd_join(User &user, std::string param)
 				send_err(user.get_fd(), "already in a room");
 			else
 			{
-				Room	room(param);
 				int i = find_room_idx(param);
-				room.add_user(user);
-				user.set_room_idx(i);
-				if (i == -1)
+				if (i == -1) // 방이 없을 때
+				{
+					Room	room(param);
+					user.set_room_idx(i);
+					room.add_user(user);
 					_rooms.push_back(room);
-				room.show_info();
+				}
+				else // 방이 있을 때
+				{
+					user.set_room_idx(i);
+					_rooms[i].add_user(user);
+				}
+				_rooms[find_room_idx(param)].show_info();
 			}
 		}
 		else
