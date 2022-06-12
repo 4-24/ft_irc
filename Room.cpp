@@ -28,10 +28,9 @@ void	Room::show_info()
 	std::cout << "# Room name: " << _name << std::endl;
 	std::cout << "------------------------------------" << std::endl;
 
-	std::cout << "# Users: " << std::endl;
+	std::cout << "# Users: ";
 	if (_users.size() > 0)
 	{
-		std::cout << "users: ";
 		for (unsigned long i = 0; i < _users.size(); i++)
 			std::cout << _users[i]->get_nickname() << " ";
 		std::cout << std::endl;
