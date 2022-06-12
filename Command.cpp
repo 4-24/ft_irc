@@ -120,8 +120,6 @@ void	Server::cmd_mode(int fd, std::vector<std::string> params)
 
 void	Server::cmd_join(User &user, std::string param)
 {
-
-
 	if (param.size() > 0)
 	{
 		if (param[0] == '#')
