@@ -18,9 +18,9 @@ void	Server::execute(User &user, Message message)
 		else if (!user.is_registered() && command != "NICK" && command != "USER")
 			send_err(fd, "register first");
 		else if (command == "NICK")
-			cmd_nick(fd, params);
+			cmd_nick(user, params[0]);
 		else if (command == "USER")
-			cmd_user(fd, params);
+			cmd_user(user, params[0]);
 		else if (command == "OPER")
 			cmd_oper(fd, params);
 		else if (command == "MODE")
@@ -46,7 +46,7 @@ void	Server::execute(User &user, Message message)
 
 void	Server::send_msg(int fd, std::string message)
 {
-	send(fd, (GREEN + message + RESET + "\n").c_str(), message.size() + 13, 0);
+	send(fd, (GREEN + message + RESET + "\n").c_str(), message.size() + 11, 0);
 }
 
 void	Server::send_err(int fd, std::string error)
@@ -69,14 +69,43 @@ void	Server::cmd_pass(User &user, std::vector<std::string> params)
 	}
 }
 
-void	Server::cmd_nick(int fd, std::vector<std::string> params)
-{
-	(void)fd, (void)params; //TODO: Implement this
+bool check_nick(std::string const &str) {
+ 	return (str.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") ==
+		std::string::npos) && (str.size() > 0 && str.size() < 9);
 }
 
-void	Server::cmd_user(int fd, std::vector<std::string> params)
+void	Server::cmd_nick(User &user, std::string param)
 {
-	(void)fd, (void)params; //TODO: Implement this
+	if (!check_nick(param))
+		send_err(user.get_fd(), "invalid nick");
+	else
+	{
+		user.set_nickname(param);
+		send_msg(user.get_fd(), "nickname set");
+
+		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
+		{
+			user.set_registered(true);
+			send_msg(user.get_fd(), "registered");
+		}
+	}
+}
+
+void	Server::cmd_user(User &user, std::string param)
+{
+	if (user.is_registered())
+		send_err(user.get_fd(), "already registered");
+	else
+	{
+		user.set_username(param);
+		send_msg(user.get_fd(), "username set");
+
+		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
+		{
+			user.set_registered(true);
+			send_msg(user.get_fd(), "registered");
+		}
+	}
 }
 
 void	Server::cmd_oper(int fd, std::vector<std::string> params)

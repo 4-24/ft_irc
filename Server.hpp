@@ -51,8 +51,8 @@ class Server
 		void							send_err(int fd, std::string error);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
-		void	cmd_nick(int fd, std::vector<std::string> params);
-		void	cmd_user(int fd, std::vector<std::string> params);
+		void	cmd_nick(User &user, std::string param);
+		void	cmd_user(User &user, std::string param);
 		void	cmd_oper(int fd, std::vector<std::string> params);
 		void	cmd_mode(int fd, std::vector<std::string> params);
 		void	cmd_join(int fd, std::vector<std::string> params);

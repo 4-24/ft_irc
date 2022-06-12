@@ -28,9 +28,14 @@ class User
 		void		set_authenticated(bool authenticated);
 		void		set_registered(bool registered);
 
+		void		set_nickname(std::string nickname);
+		void		set_username(std::string username);
+
 		std::string	get_buffer() const;
 		int			get_fd() const;
 		Message		get_message() const;
+		std::string	get_nickname() const;
+		std::string	get_username() const;
 };
 
 #endif

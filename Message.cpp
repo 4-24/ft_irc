@@ -1,6 +1,11 @@
 # include "Message.hpp"
 
-Message::Message() {}
+Message::Message()
+{
+	_prefix = "";
+	_command = "";
+	_params = std::vector<std::string>();
+}
 
 Message::~Message() {}
 

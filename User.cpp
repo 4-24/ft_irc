@@ -57,6 +57,16 @@ std::string	User::get_buffer() const
 	return _buffer;
 }
 
+std::string User::get_nickname() const
+{
+	return _nickname;
+}
+
+std::string	User::get_username() const
+{
+	return _username;
+}
+
 int	User::get_fd() const
 {
 	return (_fd);
@@ -65,6 +75,16 @@ int	User::get_fd() const
 Message	User::get_message() const
 {
 	return (_message);
+}
+
+void	User::set_nickname(std::string nickname)
+{
+	_nickname = nickname;
+}
+
+void	User::set_username(std::string username)
+{
+	_username = username;
 }
 
 void	User::set_authenticated(bool authenticated)
