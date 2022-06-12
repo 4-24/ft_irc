@@ -128,11 +128,11 @@ void	Server::quit(int fd)
 	std::cout << "Users current: " << _users.size() << std::endl;
 	std::cout << "Fds current: " << _fds.size() << std::endl;
 
-	int idx = find_user_idx(fd);
+	int user_idx = find_user_idx(fd);
 	int fd_idx = find_fd_idx(fd);
-	delete *(_users.begin() + idx);
+	delete *(_users.begin() + user_idx);
 	std::cout << "deleted user: " << fd << std::endl;
-	_users.erase(_users.begin() + idx);
+	_users.erase(_users.begin() + user_idx);
 	std::cout << "Users left: " << _users.size() << std::endl;
 	_fds.erase(_fds.begin() + fd_idx);
 	std::cout << "Fds left: " << _fds.size() << std::endl;
