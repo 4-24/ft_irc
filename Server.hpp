@@ -17,6 +17,7 @@
 # include "User.hpp"
 # include "Socket.hpp"
 # include "Message.hpp"
+# include "Room.hpp"
 
 # define TIMEOUT 1000
 # define GREEN "\x1b[32m"
@@ -31,7 +32,8 @@ class Server
 		int								_port;
 		int								server_socket;
 		std::string						_password;
-		std::vector<User *>				_users;
+		std::vector<User>				_users;
+		std::vector<Room>				_rooms;
 		Socket							*_socket;
 		std::vector<struct pollfd>		_fds;
 
@@ -46,6 +48,7 @@ class Server
 		int								find_fd_idx(int fd);
 		void							chat(User &user);
 		void							execute(User &user, Message message);
+		int								find_room_idx(std::string room_name);
 
 		void							send_msg(int fd, std::string message);
 		void							send_err(int fd, std::string error);
@@ -55,7 +58,7 @@ class Server
 		void	cmd_user(User &user, std::string param);
 		void	cmd_oper(int fd, std::vector<std::string> params);
 		void	cmd_mode(int fd, std::vector<std::string> params);
-		void	cmd_join(int fd, std::vector<std::string> params);
+		void	cmd_join(User &user, std::string param);
 		void	cmd_kick(int fd, std::vector<std::string> params);
 		void	cmd_part(int fd, std::vector<std::string> params);
 		void	cmd_names(int fd, std::vector<std::string> params);

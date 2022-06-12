@@ -5,6 +5,7 @@ User::User(int fd)
 	_fd = fd;
 	_is_registered = false;
 	_is_authenticated = false;
+	_room_idx = -1;
 }
 
 User::~User() {}
@@ -72,6 +73,11 @@ int	User::get_fd() const
 	return (_fd);
 }
 
+int	User::get_room_idx() const
+{
+	return _room_idx;
+}
+
 Message	User::get_message() const
 {
 	return (_message);
@@ -95,4 +101,9 @@ void	User::set_authenticated(bool authenticated)
 void	User::set_registered(bool registered)
 {
 	_is_registered = registered;
+}
+
+void	User::set_room_idx(int room_idx)
+{
+	_room_idx = room_idx;
 }

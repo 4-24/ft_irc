@@ -54,7 +54,7 @@ void	Server::create_poll(int fd, bool is_server)
 
 	if (!is_server)
 	{
-		_users.push_back(new User(fd));
+		_users.push_back(User(fd));
 		if (_password != "")
 			send_msg(fd, "Please enter ircserv password.");
 	}
@@ -63,16 +63,16 @@ void	Server::create_poll(int fd, bool is_server)
 User &Server::find_user(int fd)
 {
 	for (size_t i = 1; i < _users.size(); i++)
-		if (_users[i]->get_fd() == fd)
-			return *_users[i];
+		if (_users[i].get_fd() == fd)
+			return _users[i];
 
-	return *_users[0];
+	return _users[0];
 }
 
 int	Server::find_user_idx(int fd)
 {
 	for (size_t i = 1; i < _users.size(); i++)
-		if (_users[i]->get_fd() == fd)
+		if (_users[i].get_fd() == fd)
 			return i;
 
 	return -1;
@@ -111,4 +111,13 @@ void	Server::chat(User &user)
 		execute(user, user.get_message());
 		user.clear_message();
 	}
+}
+
+int	Server::find_room_idx(std::string name)
+{
+	for (size_t i = 0; i < _rooms.size(); i++)
+		if (_rooms[i].get_name() == name)
+			return i;
+
+	return -1;
 }

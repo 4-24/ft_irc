@@ -26,7 +26,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "MODE")
 			cmd_mode(fd, params);
 		else if (command == "JOIN")
-			cmd_join(fd, params);
+			cmd_join(user, params[0]);
 		else if (command == "KICK")
 			cmd_kick(fd, params);
 		else if (command == "PART")
@@ -118,9 +118,30 @@ void	Server::cmd_mode(int fd, std::vector<std::string> params)
 	(void)fd, (void)params; //TODO: Implement this
 }
 
-void	Server::cmd_join(int fd, std::vector<std::string> params)
+void	Server::cmd_join(User &user, std::string param)
 {
-	(void)fd, (void)params; //TODO: Implement this
+
+
+	if (param.size() > 0)
+	{
+		if (param[0] == '#')
+		{
+			if (user.get_room_idx() != -1) // 유저가 이미 방에 들어가있을 때
+				send_err(user.get_fd(), "already in a room");
+			else
+			{
+				Room	room(param);
+				int i = find_room_idx(param);
+				room.add_user(user);
+				user.set_room_idx(i);
+				if (i == -1)
+					_rooms.push_back(room);
+				room.show_info();
+			}
+		}
+		else
+			send_err(user.get_fd(), "invalid room");
+	}
 }
 
 void	Server::cmd_kick(int fd, std::vector<std::string> params)
@@ -159,8 +180,6 @@ void	Server::quit(int fd)
 
 	int user_idx = find_user_idx(fd);
 	int fd_idx = find_fd_idx(fd);
-	delete *(_users.begin() + user_idx);
-	std::cout << "deleted user: " << fd << std::endl;
 	_users.erase(_users.begin() + user_idx);
 	std::cout << "Users left: " << _users.size() << std::endl;
 	_fds.erase(_fds.begin() + fd_idx);
