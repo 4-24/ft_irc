@@ -43,6 +43,7 @@ class Server
 		void							create_poll(int fd, bool is_server);
 		User							&find_user(int fd);
 		int								find_user_idx(int fd);
+		int								find_fd_idx(int fd);
 		void							chat(User &user);
 		void							execute(User &user, Message message);
 
