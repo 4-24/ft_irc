@@ -46,12 +46,17 @@ class Server
 		User							&find_user(int fd);
 		int								find_user_idx(int fd);
 		int								find_fd_idx(int fd);
+		int								find_nickname(std::string name);
+		int								find_username(std::string name);
 		void							chat(User &user);
 		void							execute(User &user, Message message);
 		int								find_room_idx(std::string room_name);
+		bool							is_flooding(User &user);
+		void							replace_user(User &old_user, User &new_user);
 
 		void							send_msg(int fd, std::string message);
 		void							send_err(int fd, std::string error);
+		void							send_user_info(User user, std::string msg);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(User &user, std::string param);

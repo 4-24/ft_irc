@@ -13,14 +13,16 @@ void	Server::execute(User &user, Message message)
 			quit(fd);
 		else if (command == "PASS")
 			cmd_pass(user, params);
-		else if (_password != "" && !user.is_authenticated())
+		else if (_password != "" && !user.is_authenticated()) // 인증되지 않은 사용자
 			send_err(fd, "unauthenticated user. stop.");
-		else if (!user.is_registered() && command != "NICK" && command != "USER")
+		else if (!user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
 			send_err(fd, "register first");
 		else if (command == "NICK")
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
 			cmd_user(user, params[0]);
+		else if (is_flooding(user)) // 플러딩 체크
+			return ;
 		else if (command == "OPER")
 			cmd_oper(fd, params);
 		else if (command == "MODE")
@@ -47,6 +49,14 @@ void	Server::execute(User &user, Message message)
 void	Server::send_msg(int fd, std::string message)
 {
 	send(fd, (GREEN + message + RESET + "\n").c_str(), message.size() + 11, 0);
+}
+
+void	Server::send_user_info(User user, std::string msg)
+{
+	std::stringstream ss;
+	ss << "[" << user.get_nickname() << "!" << user.get_username() << "@" << "irc.4-24.kr]";
+	send_msg(user.get_fd(), msg + ss.str());
+
 }
 
 void	Server::send_err(int fd, std::string error)
@@ -76,34 +86,41 @@ bool check_nick(std::string const &str) {
 
 void	Server::cmd_nick(User &user, std::string param)
 {
-	if (!check_nick(param))
+	if (!check_nick(param)) // 잘못된 닉네임
 		send_err(user.get_fd(), "invalid nick");
-	else
+	else if (find_nickname(param) != -1) // 이미 존재하는 닉네임
+		send_err(user.get_fd(), "nickname already exists");
+	else // 정상적인 닉네임
 	{
 		user.set_nickname(param);
 		send_msg(user.get_fd(), "nickname set");
-
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
 			user.set_registered(true);
-			send_msg(user.get_fd(), "registered");
+			send_user_info(user, "Welcome to the Internet Relay Network: ");
 		}
 	}
 }
 
 void	Server::cmd_user(User &user, std::string param)
 {
-	if (user.is_registered())
+	if (user.is_registered()) // 이미 등록된 유저
 		send_err(user.get_fd(), "already registered");
-	else
+	else // 정상적인 유저
 	{
-		user.set_username(param);
-		send_msg(user.get_fd(), "username set");
-
+		if (find_username(param) == -1)
+		{
+			user.set_username(param);
+			send_msg(user.get_fd(), "username set");
+		}
+		else // 기존에 등록된 유저로 로그인
+		{
+			replace_user(_users[find_username(param)], user);
+		}
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
 			user.set_registered(true);
-			send_msg(user.get_fd(), "registered");
+			send_user_info(user, "Welcome to the Internet Relay Network: ");
 		}
 	}
 }
@@ -185,8 +202,44 @@ void	Server::quit(int fd)
 
 	int user_idx = find_user_idx(fd);
 	int fd_idx = find_fd_idx(fd);
+	std::cout << "User idx: " << user_idx << std::endl;
+	std::cout << "Fd idx: " << fd_idx << std::endl;
 	_users.erase(_users.begin() + user_idx);
 	std::cout << "Users left: " << _users.size() << std::endl;
 	_fds.erase(_fds.begin() + fd_idx);
 	std::cout << "Fds left: " << _fds.size() << std::endl;
+}
+
+bool	Server::is_flooding(User &user)
+{
+	time_t t = time(0);
+
+	if (t - user.get_last_message_time() > user.get_message_timeout())
+	{
+		user.set_last_message_time(t);
+		user.set_message_timeout(1);
+		return false;
+	}
+	user.set_last_message_time(t);
+	if (user.get_message_timeout() < (2 << 6))
+		user.set_message_timeout(user.get_message_timeout() * 2);
+	std::stringstream ss;
+	ss << user.get_message_timeout();
+	send_err(user.get_fd(), "flood detected, please wait " + ss.str() + " seconds");
+	return true;
+}
+
+void	Server::replace_user(User &old_user, User &new_user)
+{
+	int new_idx = find_user_idx(new_user.get_fd());
+	int old_fd = old_user.get_fd();
+
+	_users.erase(_users.begin() + new_idx); // 새로운 유저 삭제
+	old_user.set_fd(new_idx);
+	new_user = old_user;
+	send_msg(old_fd, "Goodbye!");
+	close(old_fd);
+	_fds.erase(_fds.begin() + find_user_idx(old_fd));
+	std::cout << "User " << old_fd << " disconnected." << std::endl;
+	send_msg(new_user.get_fd(), "user login: " + user.get_nickname());
 }
