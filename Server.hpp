@@ -59,7 +59,7 @@ class Server
 		void							send_msg(int fd, std::string message);
 		void							send_err(int fd, std::string error);
 		void							send_user_info(User user, std::string msg);
-		void							send_channel(int idx, std::string message);
+		void							send_msg_to_room(int idx, std::string message);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(User &user, std::string param);

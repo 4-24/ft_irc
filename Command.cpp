@@ -65,7 +65,7 @@ void	Server::send_err(int fd, std::string error)
 	throw std::runtime_error((error + "\n").c_str());
 }
 
-void	Server::send_channel(int idx, std::string message)
+void	Server::send_msg_to_room(int idx, std::string message)
 {
 	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
 		send_msg(_rooms[idx].get_users()[i]->get_fd(), message);
@@ -189,7 +189,20 @@ void	Server::cmd_names(int fd, std::vector<std::string> params)
 
 void	Server::cmd_privmsg(int fd, std::vector<std::string> params)
 {
-	(void)fd, (void)params; //TODO: Implement this
+	if (params.size() < 2)
+		send_err(fd, "Need more parameters");
+	for (vector<string>::iterator i = params.begin(); i < params.end(); ++i)
+	{
+		if (i->at(0) == "#")
+		{
+			if (find_room_idx(*i) == -1)
+				send_err(fd, "No such room");
+			else
+				send_msg_to_room(find_room_idx(*i), params[0]);
+		}
+
+	}
+
 }
 
 void	Server::quit(int fd)
