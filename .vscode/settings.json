@@ -1,0 +1,8 @@
+{
+	"files.associations": {
+		"*.swift": "swift",
+		"vector": "cpp",
+		"iosfwd": "cpp",
+		"iterator": "cpp"
+	}
+}
