@@ -70,7 +70,7 @@ class Server
 		void	cmd_kick(int fd, std::vector<std::string> params);
 		void	cmd_part(int fd, std::vector<std::string> params);
 		void	cmd_names(int fd, std::vector<std::string> params);
-		void	cmd_privmsg(int fd, std::vector<std::string> params);
+		void	cmd_privmsg(User &user, std::vector<std::string> params);
 
 		void	quit(int fd);
 };

@@ -92,6 +92,11 @@ Message	User::get_message() const
 	return (_message);
 }
 
+std::string	User::get_prefix() const
+{
+	return _message.get_prefix();
+}
+
 time_t	User::get_last_message_time() const
 {
 	return _last_message_time;

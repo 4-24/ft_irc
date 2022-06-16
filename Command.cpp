@@ -187,20 +187,26 @@ void	Server::cmd_names(int fd, std::vector<std::string> params)
 	(void)fd, (void)params; //TODO: Implement this
 }
 
-void	Server::cmd_privmsg(int fd, std::vector<std::string> params)
+void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 {
 	if (params.size() < 2)
 		send_err(fd, "Need more parameters");
 	for (vector<string>::iterator i = params.begin(); i < params.end(); ++i)
 	{
-		if (i->at(0) == "#")
+		if (i->at(0) == "#") // 방에서 메시지를 보낼 때
 		{
 			if (find_room_idx(*i) == -1)
 				send_err(fd, "No such room");
 			else
-				send_msg_to_room(find_room_idx(*i), params[0]);
+				send_msg_to_room(find_room_idx(*i), user.get_prefix());
 		}
-
+		else // 유저에게 메시지를 보낼 때
+		{
+			if (find_nickname(*i) == -1)
+				send_err(user.get_fd(), "No such user");
+			else
+				send_msg(_users[find_nickname(*i)].get_fd(), user.get_prefix());
+		}
 	}
 
 }

@@ -44,6 +44,7 @@ class User
 		std::string	get_buffer() const;
 		int			get_fd() const;
 		Message		get_message() const;
+		std::string	get_prefix() const;
 		std::string	get_nickname() const;
 		std::string	get_username() const;
 		int			get_room_idx() const;
