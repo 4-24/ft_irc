@@ -24,6 +24,8 @@
 # define YELLOW "\x1b[33m"
 # define RESET "\x1b[0m"
 # define MSG_LEN 512
+# define SUPER_NICK "klp"
+# define SUPER_PASS "424"
 
 
 class Server

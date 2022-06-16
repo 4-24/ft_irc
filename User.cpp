@@ -57,6 +57,11 @@ bool	User::is_authenticated()
 	return _is_authenticated;
 }
 
+bool	User::is_admin()
+{
+	return _is_admin;
+}
+
 std::string	User::get_buffer() const
 {
 	return _buffer;
@@ -97,6 +102,11 @@ time_t	User::get_message_timeout() const
 	return _message_timeout;
 }
 
+bool	User::is_admin() const
+{
+	return _is_admin;
+}
+
 void	User::set_fd(int fd)
 {
 	_fd = fd;
@@ -135,4 +145,9 @@ void	User::set_last_message_time(time_t last_message_time)
 void	User::set_message_timeout(time_t message_timeout)
 {
 	_message_timeout = message_timeout;
+}
+
+void	User::set_admin(bool admin)
+{
+	_is_admin = admin;
 }
