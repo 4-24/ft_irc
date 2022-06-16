@@ -29,7 +29,6 @@ class Server
 {
 	private:
 		int								_port;
-		int								server_socket;
 		std::string						_password;
 		std::vector<User *>				_users;
 		Socket							*_socket;
