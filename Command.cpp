@@ -208,7 +208,29 @@ void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 				send_msg(_users[find_nickname(*i)].get_fd(), user.get_prefix());
 		}
 	}
+}
 
+void	Server::cmd_notice(User &user, std::vector<std::string> params)
+{
+	if (params.size() < 2)
+		send_err(fd, "Need more parameters");
+	for (vector<string>::iterator i = params.begin(); i < params.end(); ++i)
+	{
+		if (i->at(0) == "#") // 방에서 메시지를 보낼 때
+		{
+			if (find_room_idx(*i) == -1)
+				return ;
+			else
+				send_msg_to_room(find_room_idx(*i), user.get_prefix());
+		}
+		else // 유저에게 메시지를 보낼 때
+		{
+			if (find_nickname(*i) == -1)
+				return ;
+			else
+				send_msg(_users[find_nickname(*i)].get_fd(), user.get_prefix());
+		}
+	}
 }
 
 void	Server::quit(int fd)
