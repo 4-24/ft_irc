@@ -65,6 +65,12 @@ void	Server::send_err(int fd, std::string error)
 	throw std::runtime_error((error + "\n").c_str());
 }
 
+void	Server::send_channel(int idx, std::string message)
+{
+	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
+		send_msg(_rooms[idx].get_users()[i]->get_fd(), message);
+}
+
 void	Server::cmd_pass(User &user, std::vector<std::string> params)
 {
 	if (params.size() == 1)
@@ -186,11 +192,6 @@ void	Server::cmd_privmsg(int fd, std::vector<std::string> params)
 	(void)fd, (void)params; //TODO: Implement this
 }
 
-void	Server::cmd_notice(int fd, std::vector<std::string> params)
-{
-	(void)fd, (void)params; //TODO: Implement this
-}
-
 void	Server::quit(int fd)
 {
 	send_msg(fd, "Goodbye!");
@@ -241,5 +242,5 @@ void	Server::replace_user(User &old_user, User &new_user)
 	close(old_fd);
 	_fds.erase(_fds.begin() + find_user_idx(old_fd));
 	std::cout << "User " << old_fd << " disconnected." << std::endl;
-	send_msg(new_user.get_fd(), "user login: " + user.get_nickname());
+	send_msg(new_user.get_fd(), "user login: " + new_user.get_nickname());
 }

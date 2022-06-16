@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"*.swift": "swift",
+		"stdexcept": "cpp",
+		"sstream": "cpp"
+	}
+}
