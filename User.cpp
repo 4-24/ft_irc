@@ -10,6 +10,7 @@ User::User(int fd)
 	_message_timeout = 1;
 	_nickname = "";
 	_username = "";
+	_is_admin = false;
 }
 
 User::~User() {}

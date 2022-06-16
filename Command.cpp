@@ -56,7 +56,6 @@ void	Server::send_user_info(User user, std::string msg)
 	std::stringstream ss;
 	ss << "[" << user.get_nickname() << "!" << user.get_username() << "@" << "irc.4-24.kr]";
 	send_msg(user.get_fd(), msg + ss.str());
-
 }
 
 void	Server::send_err(int fd, std::string error)
@@ -127,7 +126,17 @@ void	Server::cmd_user(User &user, std::string param)
 
 void	Server::cmd_oper(int fd, std::vector<std::string> params)
 {
-	(void)fd, (void)params; //TODO: Implement this
+	int user_idx = find_user_idx(fd);
+
+	if (params.size() != 2)
+		send_err(fd, "usage : ./oper [nick] [password]");
+	if (params[0] != SUPER_NICK)
+		send_err(fd, "wrong host nick name");
+	if (params[1] != SUPER_PASS)
+		send_err(fd, "wrong host password");
+	_users[user_idx].set_admin(true);
+	send_msg(fd, "Operator privileges have been obtained");
+	std::cout << "\nUSER[" << user_idx << "] Operator privileges have been obtained\n" << std::endl;
 }
 
 void	Server::cmd_mode(int fd, std::vector<std::string> params)
@@ -241,5 +250,5 @@ void	Server::replace_user(User &old_user, User &new_user)
 	close(old_fd);
 	_fds.erase(_fds.begin() + find_user_idx(old_fd));
 	std::cout << "User " << old_fd << " disconnected." << std::endl;
-	send_msg(new_user.get_fd(), "user login: " + user.get_nickname());
+	send_msg(new_user.get_fd(), "user login: " + new_user.get_nickname());
 }
