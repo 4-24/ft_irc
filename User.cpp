@@ -5,6 +5,11 @@ User::User(int fd)
 	_fd = fd;
 	_is_registered = false;
 	_is_authenticated = false;
+	_room_idx = -1;
+	_last_message_time = time(NULL);
+	_message_timeout = 1;
+	_nickname = "";
+	_username = "";
 }
 
 User::~User() {}
@@ -57,14 +62,54 @@ std::string	User::get_buffer() const
 	return _buffer;
 }
 
+std::string User::get_nickname() const
+{
+	return _nickname;
+}
+
+std::string	User::get_username() const
+{
+	return _username;
+}
+
 int	User::get_fd() const
 {
 	return (_fd);
 }
 
+int	User::get_room_idx() const
+{
+	return _room_idx;
+}
+
 Message	User::get_message() const
 {
 	return (_message);
+}
+
+time_t	User::get_last_message_time() const
+{
+	return _last_message_time;
+}
+
+time_t	User::get_message_timeout() const
+{
+	return _message_timeout;
+}
+
+void	User::set_fd(int fd)
+{
+	_fd = fd;
+}
+
+void	User::set_nickname(std::string nickname)
+{
+	_nickname = nickname;
+}
+
+void	User::set_username(std::string username)
+{
+	_username = username;
 }
 
 void	User::set_authenticated(bool authenticated)
@@ -75,4 +120,19 @@ void	User::set_authenticated(bool authenticated)
 void	User::set_registered(bool registered)
 {
 	_is_registered = registered;
+}
+
+void	User::set_room_idx(int room_idx)
+{
+	_room_idx = room_idx;
+}
+
+void	User::set_last_message_time(time_t last_message_time)
+{
+	_last_message_time = last_message_time;
+}
+
+void	User::set_message_timeout(time_t message_timeout)
+{
+	_message_timeout = message_timeout;
 }

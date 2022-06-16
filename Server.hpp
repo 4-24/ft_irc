@@ -17,6 +17,7 @@
 # include "User.hpp"
 # include "Socket.hpp"
 # include "Message.hpp"
+# include "Room.hpp"
 
 # define TIMEOUT 1000
 # define GREEN "\x1b[32m"
@@ -30,7 +31,8 @@ class Server
 	private:
 		int								_port;
 		std::string						_password;
-		std::vector<User *>				_users;
+		std::vector<User>				_users;
+		std::vector<Room>				_rooms;
 		Socket							*_socket;
 		std::vector<struct pollfd>		_fds;
 
@@ -41,24 +43,33 @@ class Server
 		void							start();
 		void							create_poll(int fd, bool is_server);
 		User							&find_user(int fd);
+		int								find_user_idx(int fd);
+		int								find_fd_idx(int fd);
+		int								find_nickname(std::string name);
+		int								find_username(std::string name);
 		void							chat(User &user);
 		void							execute(User &user, Message message);
+		int								find_room_idx(std::string room_name);
+		bool							is_flooding(User &user);
+		void							replace_user(User &old_user, User &new_user);
 
 		void							send_msg(int fd, std::string message);
 		void							send_err(int fd, std::string error);
+		void							send_user_info(User user, std::string msg);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
-		void	cmd_nick(int user_fd, std::vector<std::string> params);
-		void	cmd_user(int user_fd, std::vector<std::string> params);
-		void	cmd_oper(int user_fd, std::vector<std::string> params);
-		void	cmd_mode(int user_fd, std::vector<std::string> params);
-		void	cmd_join(int user_fd, std::vector<std::string> params);
-		void	cmd_kick(int user_fd, std::vector<std::string> params);
-		void	cmd_part(int user_fd, std::vector<std::string> params);
-		void	cmd_names(int user_fd, std::vector<std::string> params);
-		void	cmd_privmsg(int user_fd, std::vector<std::string> params);
-		void	cmd_notice(int user_fd, std::vector<std::string> params);
-		void	cmd_quit(int user_fd);
+		void	cmd_nick(User &user, std::string param);
+		void	cmd_user(User &user, std::string param);
+		void	cmd_oper(int fd, std::vector<std::string> params);
+		void	cmd_mode(int fd, std::vector<std::string> params);
+		void	cmd_join(User &user, std::string param);
+		void	cmd_kick(int fd, std::vector<std::string> params);
+		void	cmd_part(int fd, std::vector<std::string> params);
+		void	cmd_names(int fd, std::vector<std::string> params);
+		void	cmd_privmsg(int fd, std::vector<std::string> params);
+		void	cmd_notice(int fd, std::vector<std::string> params);
+
+		void	quit(int fd);
 };
 
 #endif
