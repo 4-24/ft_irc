@@ -22,6 +22,7 @@
 # define TIMEOUT 1000
 # define GREEN "\x1b[32m"
 # define YELLOW "\x1b[33m"
+# define DIM "\x1b[2m"
 # define RESET "\x1b[0m"
 # define MSG_LEN 512
 # define SUPER_NICK "klp"
@@ -59,7 +60,10 @@ class Server
 		void							send_msg(int fd, std::string message);
 		void							send_err(int fd, std::string error);
 		void							send_user_info(User user, std::string msg);
-		void							send_msg_to_room(int idx, std::string message);
+		void							send_privmsg_to_room(int sender, int idx, std::string message);
+		void							send_notice_to_room(int sender, int idx, std::string message);
+		void							send_privmsg(int fd, std::string message);
+		void							send_notice(int fd, std::string message);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(User &user, std::string param);

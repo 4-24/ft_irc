@@ -35,8 +35,10 @@ void	Server::execute(User &user, Message message)
 			cmd_part(fd, params);
 		else if (command == "NAMES")
 			cmd_names(fd, params);
-		else if (command == "PRIVMSG" || command == "NOTICE")
+		else if (command == "PRIVMSG")
 			cmd_privmsg(user, params);
+		else if (command == "NOTICE")
+			cmd_notice(user, params);
 		else
 			send_err(fd, "command not found");
 	}
@@ -65,11 +67,31 @@ void	Server::send_err(int fd, std::string error)
 	throw std::runtime_error((error + "\n").c_str());
 }
 
-void	Server::send_msg_to_room(int idx, std::string message)
+void	Server::send_privmsg_to_room(int sender, int idx, std::string message)
 {
 	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
-		send_msg(_rooms[idx].get_users()[i]->get_fd(), message);
+		if (_rooms[idx].get_users()[i]->get_fd() != sender)
+			send_privmsg(_rooms[idx].get_users()[i]->get_fd(), message);
 }
+
+void	Server::send_notice_to_room(int sender, int idx, std::string message)
+{
+	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
+		if (_rooms[idx].get_users()[i]->get_fd() != sender)
+			send_notice(_rooms[idx].get_users()[i]->get_fd(), message);
+}
+
+
+void	Server::send_privmsg(int fd, std::string message)
+{
+	send(fd, (message + "\n").c_str(), message.size() + 1, 0);
+}
+
+void	Server::send_notice(int fd, std::string message)
+{
+	send(fd, (DIM + message + RESET + "\n").c_str(), message.size() + 10, 0);
+}
+
 
 void	Server::cmd_pass(User &user, std::vector<std::string> params)
 {
@@ -201,22 +223,20 @@ void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 {
 	if (params.size() < 2)
 		send_err(user.get_fd(), "Need more parameters");
-	for (std::vector<std::string>::iterator i = params.begin(); i < params.end(); ++i)
+
+	if (params[0][0] == '#') // 방에서 메시지를 보낼 때
 	{
-		if (i->at(0) == '#') // 방에서 메시지를 보낼 때
-		{
-			if (find_room_idx(*i) == -1)
-				send_err(user.get_fd(), "No such room");
-			else
-				send_msg_to_room(find_room_idx(*i), user.get_prefix());
-		}
-		else // 유저에게 메시지를 보낼 때
-		{
-			if (find_nickname(*i) == -1)
-				send_err(user.get_fd(), "No such user");
-			else
-				send_msg(_users[find_nickname(*i)].get_fd(), user.get_prefix());
-		}
+		if (find_room_idx(params[0]) == -1)
+			send_err(user.get_fd(), "No such room");
+		else
+			send_privmsg_to_room(user.get_fd(), find_room_idx(params[0]), params[1]);
+	}
+	else // 유저에게 메시지를 보낼 때
+	{
+		if (find_nickname(params[0]) == -1)
+			send_err(user.get_fd(), "No such user");
+		else
+			send_privmsg(_users[find_nickname(params[0])].get_fd(), params[1]);
 	}
 }
 
@@ -224,22 +244,20 @@ void	Server::cmd_notice(User &user, std::vector<std::string> params)
 {
 	if (params.size() < 2)
 		send_err(user.get_fd(), "Need more parameters");
-	for (std::vector<std::string>::iterator i = params.begin(); i < params.end(); ++i)
+
+	if (params[0][0] == '#') // 방에서 메시지를 보낼 때
 	{
-		if (i->at(0) == '#') // 방에서 메시지를 보낼 때
-		{
-			if (find_room_idx(*i) == -1)
-				return ;
-			else
-				send_msg_to_room(find_room_idx(*i), user.get_prefix());
-		}
-		else // 유저에게 메시지를 보낼 때
-		{
-			if (find_nickname(*i) == -1)
-				return ;
-			else
-				send_msg(_users[find_nickname(*i)].get_fd(), user.get_prefix());
-		}
+		if (find_room_idx(params[0]) == -1)
+			return ;
+		else
+			send_notice_to_room(user.get_fd(), find_room_idx(params[0]), params[1]);
+	}
+	else // 유저에게 메시지를 보낼 때
+	{
+		if (find_nickname(params[0]) == -1)
+			return ;
+		else
+			send_notice(_users[find_nickname(params[0])].get_fd(), params[1]);
 	}
 }
 
