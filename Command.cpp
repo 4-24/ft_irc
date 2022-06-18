@@ -170,6 +170,19 @@ void	Server::cmd_oper(int fd, std::vector<std::string> params)
 
 void	Server::cmd_mode(int fd, std::vector<std::string> params)
 {
+	// int user_idx = find_user_idx(fd);
+
+	// if (!_users[user_idx].is_admin())
+	// 	send_msg(fd, "you're not operator");
+	// if (params[0][0] == '+')
+	// {
+	// 	if (params[0][1] == 'o')
+
+	// }
+	// else if (params[0][0] == '-')
+	// {
+
+	// }
 	(void)fd, (void)params; //TODO: Implement this
 }
 
