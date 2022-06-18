@@ -5,6 +5,7 @@ User::User(int fd)
 	_fd = fd;
 	_is_registered = false;
 	_is_authenticated = false;
+	_is_admin = false;
 	_room_idx = -1;
 	_last_message_time = time(NULL);
 	_message_timeout = 1;
