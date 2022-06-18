@@ -22,7 +22,7 @@ void	Room::remove_user(User &user)
 		}
 }
 
-void	Room::show_info()
+void	Room::show_users()
 {
 	std::cout << "------------------------------------" << std::endl;
 	std::cout << "# Room name: " << _name << std::endl;

@@ -102,17 +102,20 @@ void	Server::chat(User &user)
 		else if (nbytes > MSG_LEN)
 			throw std::runtime_error("recv: message too long");
 		else if (nbytes == 0)
-			throw std::runtime_error("recv: connection closed");
-		exit(1);
+			quit(user.get_fd());
 	}
-	buff[nbytes] = 0;
-	user.add_buffer(buff);
-	if (user.get_buffer().find_first_of("\n") != std::string::npos)
+	else
 	{
-		user.setup_message();
-		execute(user, user.get_message());
-		user.clear_message();
+		buff[nbytes] = 0;
+		user.add_buffer(buff);
+		if (user.get_buffer().find_first_of("\n") != std::string::npos)
+		{
+			user.setup_message();
+			execute(user, user.get_message());
+			user.clear_message();
+		}
 	}
+
 }
 
 int	Server::find_room_idx(std::string name)

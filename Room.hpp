@@ -16,7 +16,7 @@ class	Room
 
 		void				add_user(User &user);
 		void				remove_user(User &user);
-		void				show_info();
+		void				show_users();
 
 		std::string			get_name() const;
 		std::vector<User *>	get_users() const;
