@@ -32,7 +32,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "KICK")
 			cmd_kick(fd, params);
 		else if (command == "PART")
-			cmd_part(fd, params);
+			cmd_part(user, params);
 		else if (command == "NAMES")
 			cmd_names(fd, params);
 		else if (command == "PRIVMSG")
@@ -209,9 +209,33 @@ void	Server::cmd_kick(int fd, std::vector<std::string> params)
 	(void)fd, (void)params; //TODO: Implement this
 }
 
-void	Server::cmd_part(int fd, std::vector<std::string> params)
+void	Server::cmd_part(User &user, std::vector<std::string> params)
 {
-	(void)fd, (void)params; //TODO: Implement this
+	if (params.size() == 0)
+	{
+		if (user.get_room_idx() != -1)
+		{
+			_rooms[user.get_room_idx()].remove_user(user);
+			user.set_room_idx(-1);
+		}
+		else
+			send_err(user.get_fd(), "not in a room");
+	}
+	else
+	{
+		if (params[0][0] == '#')
+		{
+			if (user.get_room_idx() != -1)
+			{
+				_rooms[user.get_room_idx()].remove_user(user);
+				user.set_room_idx(-1);
+			}
+			else
+				send_err(user.get_fd(), "not in a room");
+		}
+		else
+			send_err(user.get_fd(), "invalid room");
+	}
 }
 
 void	Server::cmd_names(int fd, std::vector<std::string> params)
