@@ -22,19 +22,16 @@ void	Room::remove_user(User &user)
 		}
 }
 
-void	Room::show_users()
+std::string	Room::get_user_list()
 {
-	std::cout << "------------------------------------" << std::endl;
-	std::cout << "# Room name: " << _name << std::endl;
-	std::cout << "------------------------------------" << std::endl;
+	std::stringstream ss;
 
-	std::cout << "# Users: ";
 	if (_users.size() > 0)
 	{
 		for (unsigned long i = 0; i < _users.size(); i++)
-			std::cout << _users[i]->get_nickname() << " ";
-		std::cout << std::endl;
+			ss << _users[i]->get_nickname() << " ";
 	}
+	return ss.str();
 }
 
 std::string	Room::get_name() const

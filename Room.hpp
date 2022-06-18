@@ -2,6 +2,7 @@
 # define ROOM_HPP
 
 # include <string>
+# include <sstream>
 # include "User.hpp"
 
 class	Room
@@ -16,10 +17,10 @@ class	Room
 
 		void				add_user(User &user);
 		void				remove_user(User &user);
-		void				show_users();
 
 		std::string			get_name() const;
 		std::vector<User *>	get_users() const;
+		std::string			get_user_list();
 };
 
 #endif
