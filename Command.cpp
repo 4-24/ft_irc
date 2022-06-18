@@ -34,7 +34,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "PART")
 			cmd_part(user, params);
 		else if (command == "NAMES")
-			cmd_names(fd, params);
+			cmd_names(user, params);
 		else if (command == "PRIVMSG")
 			cmd_privmsg(user, params);
 		else if (command == "NOTICE")
@@ -187,7 +187,7 @@ void	Server::cmd_join(User &user, std::string param)
 				if (i == -1) // 방이 없을 때
 				{
 					Room	room(param);
-					user.set_room_idx(i);
+					user.set_room_idx(_rooms.size());
 					room.add_user(user);
 					_rooms.push_back(room);
 				}
@@ -196,7 +196,7 @@ void	Server::cmd_join(User &user, std::string param)
 					user.set_room_idx(i);
 					_rooms[i].add_user(user);
 				}
-				_rooms[find_room_idx(param)].show_users();
+				_rooms[find_room_idx(param)].get_user_list();
 			}
 		}
 		else
@@ -238,32 +238,38 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 	}
 }
 
-void	Server::cmd_names(int fd, std::vector<std::string> params)
+void	Server::cmd_names(User &user, std::vector<std::string> params)
 {
 	if (params.size() == 0)
 	{
-		if (find_user_idx(fd) != -1)
+		if (!_rooms.empty())
 		{
-			send_msg(fd, "Users in the room : ");
-			_rooms[find_user_idx(fd)].show_users();
+			for (unsigned long i = 0; i < _rooms.size(); i++)
+			{
+				if (_rooms[i].get_name() == "")
+					continue;
+				send_msg(user.get_fd(), _rooms[i].get_name());
+				send_msg(user.get_fd(), "Users in the room : " + _rooms[user.get_room_idx()].get_user_list());
+			}
 		}
 		else
-			send_err(fd, "not in a room");
+			send_err(user.get_fd(), "not in a room");
 	}
 	else
 	{
 		if (params[0][0] == '#')
 		{
+			send_msg(user.get_fd(), "Room: " + params[0]);
 			if (find_room_idx(params[0]) != -1)
 			{
-				send_msg(fd, "Users in the room : ");
-				_rooms[find_room_idx(params[0])].show_users();
+				send_msg(user.get_fd(), "Users in the room : " + _rooms[user.get_room_idx()].get_user_list());
+				_rooms[user.get_room_idx()].get_user_list();
 			}
 			else
-				send_err(fd, "invalid room");
+				send_err(user.get_fd(), "invalid room");
 		}
 		else
-			send_err(fd, "invalid room");
+			send_err(user.get_fd(), "invalid room");
 	}
 }
 

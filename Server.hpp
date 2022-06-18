@@ -73,7 +73,7 @@ class Server
 		void	cmd_join(User &user, std::string param);
 		void	cmd_kick(int fd, std::vector<std::string> params);
 		void	cmd_part(User &user, std::vector<std::string> params);
-		void	cmd_names(int fd, std::vector<std::string> params);
+		void	cmd_names(User &user, std::vector<std::string> params);
 		void	cmd_privmsg(User &user, std::vector<std::string> params);
 		void	cmd_notice(User &user, std::vector<std::string> params);
 

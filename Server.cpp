@@ -144,15 +144,3 @@ int	Server::find_username(std::string name)
 
 	return -1;
 }
-
-//void	Server::duplicate_user_info(User &old_user, User &new_user)
-//{
-//	new_user.set_authenticated(old_user.is_authenticated());
-//	new_user.set_registered(old_user.is_registered());
-//	new_user.set_last_message_time(old_user.get_last_message_time());
-//	new_user.set_message_timeout(old_user.get_message_timeout());
-//	new_user.set_room_idx(old_user.get_room_idx());
-
-//	if (old_user.get_room_idx() != -1)
-//		_rooms[old_user.get_room_idx()].add_user(new_user);
-//}
