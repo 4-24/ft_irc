@@ -170,23 +170,7 @@ void	Server::cmd_oper(int fd, std::vector<std::string> params)
 
 void	Server::cmd_mode(int fd, std::vector<std::string> params)
 {
-	int user_idx = find_user_idx(fd);
-
-	if (!_users[user_idx].is_admin())
-		send_err(fd, "you're not operator");
-	if (params[0].empty() || params[1].empty())
-		send_err(fd, "usage : ./mode [option] [nick]");
-	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
-	{
-		if (find_nickname(params[1]) == -1)
-			send_err(fd, "that user does not exist");
-		if (params[0][0] == '+')
-			_users[find_nickname(params[1])].set_admin(true);
-		else
-			_users[find_nickname(params[1])].set_admin(false);
-	}
-	else
-		send_err(fd, "usage : ./mode [option] [nick]");
+	(void)fd, (void)params; //TODO: Implement this
 }
 
 void	Server::cmd_join(User &user, std::string param)
