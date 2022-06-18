@@ -328,9 +328,8 @@ void	Server::replace_user(User &old_user, User &new_user)
 	int new_idx = find_user_idx(new_user.get_fd());
 	int old_fd = old_user.get_fd();
 
+	old_user.set_fd(new_user.get_fd());
 	_users.erase(_users.begin() + new_idx); // 새로운 유저 삭제
-	old_user.set_fd(new_idx);
-	new_user = old_user;
 	send_msg(old_fd, "Goodbye!");
 	close(old_fd);
 	_fds.erase(_fds.begin() + find_user_idx(old_fd));
