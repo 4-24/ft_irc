@@ -209,7 +209,7 @@ void	Server::cmd_join(User &user, std::string param)
 					user.set_room_idx(i);
 					_rooms[i].add_user(user);
 				}
-				_rooms[find_room_idx(param)].show_info();
+				_rooms[find_room_idx(param)].show_users();
 			}
 		}
 		else
@@ -253,7 +253,31 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 
 void	Server::cmd_names(int fd, std::vector<std::string> params)
 {
-	(void)fd, (void)params; //TODO: Implement this
+	if (params.size() == 0)
+	{
+		if (find_user_idx(fd) != -1)
+		{
+			send_msg(fd, "Users in the room : ");
+			_rooms[find_user_idx(fd)].show_users();
+		}
+		else
+			send_err(fd, "not in a room");
+	}
+	else
+	{
+		if (params[0][0] == '#')
+		{
+			if (find_room_idx(params[0]) != -1)
+			{
+				send_msg(fd, "Users in the room : ");
+				_rooms[find_room_idx(params[0])].show_users();
+			}
+			else
+				send_err(fd, "invalid room");
+		}
+		else
+			send_err(fd, "invalid room");
+	}
 }
 
 void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
@@ -304,17 +328,10 @@ void	Server::quit(int fd)
 	close(fd);
 	std::cout << "User " << fd << " disconnected." << std::endl;
 
-	std::cout << "Users current: " << _users.size() << std::endl;
-	std::cout << "Fds current: " << _fds.size() << std::endl;
-
 	int user_idx = find_user_idx(fd);
 	int fd_idx = find_fd_idx(fd);
-	std::cout << "User idx: " << user_idx << std::endl;
-	std::cout << "Fd idx: " << fd_idx << std::endl;
 	_users.erase(_users.begin() + user_idx);
-	std::cout << "Users left: " << _users.size() << std::endl;
 	_fds.erase(_fds.begin() + fd_idx);
-	std::cout << "Fds left: " << _fds.size() << std::endl;
 }
 
 bool	Server::is_flooding(User &user)
