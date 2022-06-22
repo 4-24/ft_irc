@@ -12,20 +12,24 @@ std::string Server::header(int code, User &user)
 
 void	Server::send_msg(User user, int code, std::string message)
 {
-	std::string res = header(code, user) + " :" +  message + "\n";
+	std::string res = header(code, user) + message + "\n";
 	send(user.get_fd(), res.c_str(), res.size(), 0);
 }
 
-void	Server::send_user_info(User user, std::string msg)
+void	Server::send_motd(User user)
 {
-	std::stringstream ss;
-	ss << "[" << user.get_nickname() << "!" << user.get_username() << "@" << "irc.4-24.kr]";
-	send_msg(user, RPL_MOTDSTART, msg + ss.str());
+	std::string serv_name = SERV;
+	std::string res1 = ":- " + serv_name + " Message of the day -";
+	send_msg(user, RPL_MOTDSTART, res1);
+
+	std::string res2 = "Welcome to the Internet Relay Network:= " + user.prefix();
+	send_msg(user, RPL_MOTD, res2);
+	send_msg(user, RPL_ENDOFMOTD, ":End of /MOTD command");
 }
 
 void	Server::send_err(User user, int code, std::string message)
 {
-	std::string res = header(code, user) + " :" + message + "\n";
+	std::string res = header(code, user) + message + "\n";
 	send(user.get_fd(), res.c_str(), res.size(), 0);
 	throw std::runtime_error((message + "\n").c_str());
 }

@@ -82,7 +82,7 @@ void	Server::cmd_nick(User &user, std::string param)
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
 			user.set_registered(true);
-			send_user_info(user, "Welcome to the Internet Relay Network: ");
+			send_motd(user);
 		}
 	}
 }
@@ -107,7 +107,7 @@ void	Server::cmd_user(User &user, std::vector<std::string> params)
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
 			user.set_registered(true);
-			send_user_info(user, "Welcome to the Internet Relay Network: ");
+			send_motd(user);
 		}
 	}
 }

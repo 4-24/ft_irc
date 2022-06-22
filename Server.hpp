@@ -25,7 +25,7 @@
 # define YELLOW "\x1b[33m"
 # define DIM "\x1b[2m"
 # define RESET "\x1b[0m"
-# define MSG_LEN 512
+# define MSG_LEN 1024
 # define SUPER_NICK "klp"
 # define SUPER_PASS "424"
 # define SERV "ircserv"
@@ -76,7 +76,7 @@ class Server
 
 		void							send_msg(User user, int code, std::string message);
 		void							send_err(User user, int code, std::string message);
-		void							send_user_info(User user, std::string msg);
+		void							send_motd(User user);
 		void							send_privmsg_to_room(int sender, int idx, std::string message);
 		void							send_notice_to_room(int sender, int idx, std::string message);
 		void							send_privmsg(User &user, std::string msg);
