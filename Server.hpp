@@ -27,6 +27,7 @@
 # define MSG_LEN 512
 # define SUPER_NICK "klp"
 # define SUPER_PASS "424"
+# define SERV "ircserv"
 
 
 class Server
@@ -57,27 +58,27 @@ class Server
 		bool							is_flooding(User &user);
 		void							replace_user(User &old_user, User &new_user);
 
-		void							send_msg(int fd, std::string message);
-		void							send_err(int fd, std::string error);
+		void	cmd_pass(User &user, std::vector<std::string> params);
+		void	cmd_nick(User &user, std::string param);
+		void	cmd_user(User &user, std::string param);
+		void	cmd_oper(User &user, std::vector<std::string> params);
+		void	cmd_mode(User &user, std::vector<std::string> params);
+		void	cmd_join(User &user, std::string param);
+		void	cmd_kick(User &user, std::vector<std::string> params);
+		void	cmd_part(User &user, std::vector<std::string> params);
+		void	cmd_names(User &user, std::vector<std::string> params);
+		void	cmd_privmsg(User &user, std::vector<std::string> params);
+		void	cmd_notice(User &user, std::vector<std::string> params);
+		void	quit(User &user);
+
+		void							send_msg(User user, int code, std::string message);
+		void							send_err(User user, int code, std::string message);
 		void							send_user_info(User user, std::string msg);
 		void							send_privmsg_to_room(int sender, int idx, std::string message);
 		void							send_notice_to_room(int sender, int idx, std::string message);
 		void							send_privmsg(int fd, std::string message);
 		void							send_notice(int fd, std::string message);
-
-		void	cmd_pass(User &user, std::vector<std::string> params);
-		void	cmd_nick(User &user, std::string param);
-		void	cmd_user(User &user, std::string param);
-		void	cmd_oper(int fd, std::vector<std::string> params);
-		void	cmd_mode(int fd, std::vector<std::string> params);
-		void	cmd_join(User &user, std::string param);
-		void	cmd_kick(int fd, std::vector<std::string> params);
-		void	cmd_part(User &user, std::vector<std::string> params);
-		void	cmd_names(User &user, std::vector<std::string> params);
-		void	cmd_privmsg(User &user, std::vector<std::string> params);
-		void	cmd_notice(User &user, std::vector<std::string> params);
-
-		void	quit(int fd);
+		std::string						header(int code, User &user);
 };
 
 #endif

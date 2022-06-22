@@ -10,7 +10,8 @@ SRC_NAME =	main.cpp \
 			Socket.cpp \
 			Message.cpp \
 			Command.cpp \
-			Room.cpp
+			Room.cpp \
+			Reply.cpp
 
 OBJ = $(SRC_NAME:.cpp=.o)
 

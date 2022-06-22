@@ -56,7 +56,7 @@ void	Server::create_poll(int fd, bool is_server)
 	{
 		_users.push_back(User(fd));
 		if (_password != "")
-			send_msg(fd, "Please enter ircserv password.");
+			send_msg(_users.back(), 300, "Please enter ircserv password.");
 	}
 }
 
@@ -102,7 +102,7 @@ void	Server::chat(User &user)
 		else if (nbytes > MSG_LEN)
 			throw std::runtime_error("recv: message too long");
 		else if (nbytes == 0)
-			quit(user.get_fd());
+			quit(user);
 	}
 	else
 	{
