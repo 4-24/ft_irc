@@ -179,7 +179,22 @@ void	Server::cmd_join(User &user, std::string param)
 
 void	Server::cmd_kick(User &user, std::vector<std::string> params)
 {
-	(void)user, (void)params; //TODO: Implement this
+	int	room_idx = find_room_idx(params[0]);
+
+	if (params.size() < 2)
+		send_err(user, ERR_NEEDMOREPARAMS, "KICK :Not enough parameter");
+	else if (room_idx == -1)
+		send_err(user, 403, params[0] + " :No such channel");
+	else if (!user.is_admin())
+		send_err(user, 482, params[0] + " :You're not channel operator");
+	else if (room_idx != user.get_room_idx())
+		send_err(user, 482, params[0] + " :You're not on that channel");
+	else if (_rooms[room_idx].is_user(params[1]) == false)
+		send_err(user, 441, params[1] + " :No such nickname");
+	else {
+		_rooms[room_idx].remove_user(params[1]);
+		send_msg(user, RPL_NONE, "kicked user :" + params[1]);
+	}
 }
 
 void	Server::cmd_part(User &user, std::vector<std::string> params)

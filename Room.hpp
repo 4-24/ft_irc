@@ -16,11 +16,13 @@ class	Room
 		~Room();
 
 		void				add_user(User &user);
+		void				remove_user(std::string name);
 		void				remove_user(User &user);
 
 		std::string			get_name() const;
 		std::vector<User *>	get_users() const;
 		std::string			get_user_list();
+		bool				is_user(std::string name) const;
 };
 
 #endif
