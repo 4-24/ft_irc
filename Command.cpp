@@ -23,7 +23,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "NICK")
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
-			cmd_user(user, params[0]);
+			cmd_user(user, params);
 		else if (is_flooding(user)) // 플러딩 체크
 			return ;
 		else if (command == "OPER")
@@ -88,20 +88,23 @@ void	Server::cmd_nick(User &user, std::string param)
 	}
 }
 
-void	Server::cmd_user(User &user, std::string param)
+void	Server::cmd_user(User &user, std::vector<std::string> params)
 {
 	if (user.is_registered()) // 이미 등록된 유저
-		send_err(user, 300, "already registered");
+		send_err(user, ERR_ALREADYREGISTRED, "You may not reregister");
+	if (params.size() != 4)
+		send_err(user, ERR_NEEDMOREPARAMS, "Not enough parameters");
 	else // 정상적인 유저
 	{
-		if (find_username(param) == -1)
+		if (find_username(params[0]) == -1)
 		{
-			user.set_username(param);
+			user.set_username(params[0]);
+			user.set_realname(params[3]);
 			send_msg(user, 300, "username set");
 		}
 		else // 기존에 등록된 유저로 로그인
 		{
-			replace_user(_users[find_username(param)], user);
+			replace_user(_users[find_username(params[0])], user);
 		}
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
@@ -291,6 +294,8 @@ void	Server::cmd_notice(User &user, std::vector<std::string> params)
 
 void	Server::quit(User &user)
 {
+	if (user.get_room_idx() != -1)
+		cmd_part(user, std::vector<std::string>(0));
 	send_msg(user, 300, "Goodbye!");
 	close(user.get_fd());
 	std::cout << "User " << user.get_fd() << " disconnected." << std::endl;

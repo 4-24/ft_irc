@@ -61,7 +61,7 @@ class Server
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(User &user, std::string param);
-		void	cmd_user(User &user, std::string param);
+		void	cmd_user(User &user, std::vector<std::string> params);
 		void	cmd_oper(User &user, std::vector<std::string> params);
 		void	cmd_mode(User &user, std::vector<std::string> params);
 		void	cmd_join(User &user, std::string param);
