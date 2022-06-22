@@ -16,12 +16,12 @@ void	Server::execute(User &user, Message message)
 			cmd_pong(user, user.get_message());
 		else if (command == "PASS")
 			cmd_pass(user, params);
-		else if (!user.is_authenticated() && !user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
-			send_err(user, ERR_NOTREGISTERED, "You have not registered. NICK - USER first.");
 		else if (command == "NICK")
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
 			cmd_user(user, params);
+		else if (!user.is_authenticated() && !user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
+			send_err(user, ERR_NOTREGISTERED, "You have not registered. NICK - USER first.");
 		else if (is_flooding(user)) // 플러딩 체크
 			return ;
 		else if (command == "OPER")
