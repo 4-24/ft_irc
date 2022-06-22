@@ -21,7 +21,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "USER")
 			cmd_user(user, params);
 		else if (!user.is_authenticated() && !user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
-			send_err(user, ERR_NOTREGISTERED, "You have not registered. NICK - USER first.");
+			send_err(user, ERR_NOTREGISTERED, "You have not registered. register first.");
 		else if (is_flooding(user)) // 플러딩 체크
 			return ;
 		else if (command == "OPER")
