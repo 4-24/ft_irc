@@ -260,7 +260,7 @@ void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 		if (find_nickname(params[0]) == -1)
 			send_err(user, 300, "No such user");
 		else
-			send_privmsg(_users[find_nickname(params[0])].get_fd(), params[1]);
+			send_privmsg(_users[find_nickname(params[0])], params[1]);
 	}
 }
 
@@ -281,7 +281,7 @@ void	Server::cmd_notice(User &user, std::vector<std::string> params)
 		if (find_nickname(params[0]) == -1)
 			return ;
 		else
-			send_notice(_users[find_nickname(params[0])].get_fd(), params[1]);
+			send_notice(_users[find_nickname(params[0])], params[1]);
 	}
 }
 

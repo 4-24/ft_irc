@@ -127,11 +127,3 @@
 #define RPL_ADMINLOC2			258
 #define RPL_ADMINEMAIL			259
 #define RPL_KILLUSER			260
-
-void							send_msg(int fd, std::string message);
-void							send_err(int fd, std::string error);
-void							send_user_info(User user, std::string msg);
-void							send_privmsg_to_room(int sender, int idx, std::string message);
-void							send_notice_to_room(int sender, int idx, std::string message);
-void							send_privmsg(int fd, std::string message);
-void							send_notice(int fd, std::string message);

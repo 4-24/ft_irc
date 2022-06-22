@@ -76,8 +76,8 @@ class Server
 		void							send_user_info(User user, std::string msg);
 		void							send_privmsg_to_room(int sender, int idx, std::string message);
 		void							send_notice_to_room(int sender, int idx, std::string message);
-		void							send_privmsg(int fd, std::string message);
-		void							send_notice(int fd, std::string message);
+		void							send_privmsg(User &user, std::string msg);
+		void							send_notice(User &user, std::string msg);
 		std::string						header(int code, User &user);
 };
 

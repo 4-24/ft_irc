@@ -34,23 +34,26 @@ void	Server::send_privmsg_to_room(int sender, int idx, std::string message)
 {
 	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
 		if (_rooms[idx].get_users()[i]->get_fd() != sender)
-			send_privmsg(_rooms[idx].get_users()[i]->get_fd(), message);
+			send_privmsg(*(_rooms[idx].get_users()[i]), message);
 }
 
 void	Server::send_notice_to_room(int sender, int idx, std::string message)
 {
 	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
 		if (_rooms[idx].get_users()[i]->get_fd() != sender)
-			send_notice(_rooms[idx].get_users()[i]->get_fd(), message);
+			send_notice(*(_rooms[idx].get_users()[i]), message);
 }
 
-
-void	Server::send_privmsg(int fd, std::string message)
+void	Server::send_privmsg(User &user, std::string msg)
 {
-	send(fd, (message + "\n").c_str(), message.size() + 1, 0);
+	std::string res = ":" + user.prefix() + " "
+			+ "PRIVMSG " + user.get_nickname() + " :" + msg + "\n";
+	send(user.get_fd(), res.c_str(), res.size(), SO_NOSIGPIPE);
 }
 
-void	Server::send_notice(int fd, std::string message)
+void	Server::send_notice(User &user, std::string msg)
 {
-	send(fd, (DIM + message + RESET + "\n").c_str(), message.size() + 10, 0);
+	std::string res = ":" + user.prefix() + " "
+			+ "NOTICE " + user.get_nickname() + " :" + msg + "\n";
+	send(user.get_fd(), res.c_str(), res.size(), SO_NOSIGPIPE);
 }
