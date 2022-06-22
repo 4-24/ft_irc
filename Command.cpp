@@ -58,10 +58,10 @@ void	Server::cmd_pass(User &user, std::vector<std::string> params)
 		if (params[0] == _password)
 		{
 			user.set_authenticated(true);
-			send_msg(user, ERR_PASSWDMISMATCH, "Authenticated...");
+			send_msg(user, RPL_NONE, "Authenticated...");
 		}
 		else
-			send_err(user, ERR_NEEDMOREPARAMS, "password incorrect");
+			send_err(user, ERR_PASSWDMISMATCH, "password incorrect");
 	}
 }
 
