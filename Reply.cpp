@@ -57,3 +57,10 @@ void	Server::send_notice(User &user, std::string msg)
 			+ "NOTICE " + user.get_nickname() + " :" + msg + "\n";
 	send(user.get_fd(), res.c_str(), res.size(), SO_NOSIGPIPE);
 }
+
+void	Server::send_pong(User &user, std::string msg)
+{
+	std::string serv_name = SERV;
+	std::string res = ":" + serv_name + " PONG :" + msg + "\n";
+	send(user.get_fd(), res.c_str(), res.size(), SO_NOSIGPIPE);
+}

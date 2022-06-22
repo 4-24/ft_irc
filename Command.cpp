@@ -10,6 +10,10 @@ void	Server::execute(User &user, Message message)
 	{
 		if (command == "QUIT")
 			quit(user);
+		else if (command == "PING")
+			cmd_ping(user, user.get_message());
+		else if (command == "PONG")
+			cmd_pong(user, user.get_message());
 		else if (command == "PASS")
 			cmd_pass(user, params);
 		else if (_password != "" && !user.is_authenticated()) // 인증되지 않은 사용자
@@ -328,4 +332,19 @@ void	Server::replace_user(User &old_user, User &new_user)
 	_fds.erase(_fds.begin() + find_user_idx(old_fd));
 	std::cout << "User " << old_fd << " disconnected." << std::endl;
 	send_msg(new_user, 300, "user login: " + new_user.get_nickname());
+}
+
+void	Server::cmd_ping(User &user, const Message &msg)
+{
+	std::string name = SERV;
+	if (msg.get_params().size() == 0)
+		send_err(user, 409, " :No origin specified");
+	else
+		send_pong(user, msg.get_params()[0]);
+}
+
+void	Server::cmd_pong(User &user, const Message &msg)
+{
+	if (msg.get_params().size() <= 0 || msg.get_params()[0] != SERV)
+		return (send_err(user, 402, msg.get_params().size() > 0 ? msg.get_params()[0] : ""));
 }

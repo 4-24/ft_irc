@@ -70,6 +70,8 @@ class Server
 		void	cmd_privmsg(User &user, std::vector<std::string> params);
 		void	cmd_notice(User &user, std::vector<std::string> params);
 		void	quit(User &user);
+		void	cmd_ping(User &user, const Message &msg);
+		void	cmd_pong(User &user, const Message &msg);
 
 		void							send_msg(User user, int code, std::string message);
 		void							send_err(User user, int code, std::string message);
@@ -78,6 +80,7 @@ class Server
 		void							send_notice_to_room(int sender, int idx, std::string message);
 		void							send_privmsg(User &user, std::string msg);
 		void							send_notice(User &user, std::string msg);
+		void							send_pong(User &user, std::string msg);
 		std::string						header(int code, User &user);
 };
 
