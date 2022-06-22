@@ -18,6 +18,7 @@
 # include "Socket.hpp"
 # include "Message.hpp"
 # include "Room.hpp"
+# include "Reply.hpp"
 
 # define TIMEOUT 1000
 # define GREEN "\x1b[32m"
