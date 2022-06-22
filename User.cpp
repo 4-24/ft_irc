@@ -11,6 +11,7 @@ User::User(int fd)
 	_message_timeout = 1;
 	_nickname = "";
 	_username = "";
+	_realname = "";
 }
 
 User::~User() {}
@@ -78,6 +79,11 @@ std::string	User::get_username() const
 	return _username;
 }
 
+std::string	User::get_realname() const
+{
+	return _realname;
+}
+
 int	User::get_fd() const
 {
 	return (_fd);
@@ -108,6 +114,11 @@ time_t	User::get_message_timeout() const
 	return _message_timeout;
 }
 
+std::string User::prefix() const
+{
+	return std::string(_nickname + "!" + _username + "@" + _realname);
+}
+
 bool	User::is_admin() const
 {
 	return _is_admin;
@@ -126,6 +137,11 @@ void	User::set_nickname(std::string nickname)
 void	User::set_username(std::string username)
 {
 	_username = username;
+}
+
+void	User::set_realname(std::string realname)
+{
+	_realname = realname;
 }
 
 void	User::set_authenticated(bool authenticated)

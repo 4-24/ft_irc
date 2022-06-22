@@ -15,6 +15,7 @@ class User
 		std::string	_buffer;
 		std::string	_nickname;
 		std::string	_username;
+		std::string	_realname;
 
 		time_t		_last_message_time;
 		time_t		_message_timeout;
@@ -36,6 +37,7 @@ class User
 		void		set_fd(int fd);
 		void		set_nickname(std::string nickname);
 		void		set_username(std::string username);
+		void		set_realname(std::string realname);
 		void		set_room_idx(int room_idx);
 		void		set_last_message_time(time_t last_message_time);
 		void		set_message_timeout(time_t message_timeout);
@@ -47,10 +49,12 @@ class User
 		std::string	get_prefix() const;
 		std::string	get_nickname() const;
 		std::string	get_username() const;
+		std::string	get_realname() const;
 		int			get_room_idx() const;
 		time_t		get_last_message_time() const;
 		time_t		get_message_timeout() const;
 		bool		is_admin() const;
+		std::string	prefix() const;
 };
 
 #endif
