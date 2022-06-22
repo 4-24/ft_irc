@@ -346,5 +346,5 @@ void	Server::cmd_ping(User &user, const Message &msg)
 void	Server::cmd_pong(User &user, const Message &msg)
 {
 	if (msg.get_params().size() <= 0 || msg.get_params()[0] != SERV)
-		return (send_err(user, 402, msg.get_params().size() > 0 ? msg.get_params()[0] : ""));
+		return (send_err(user, ERR_NOSUCHSERVER, msg.get_params().size() > 0 ? msg.get_params()[0] : ""));
 }
