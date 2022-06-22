@@ -34,8 +34,6 @@ void	Server::execute(User &user, Message message)
 			cmd_kick(user, params);
 		else if (command == "PART")
 			cmd_part(user, params);
-		else if (command == "NAMES")
-			cmd_names(user, params);
 		else if (command == "PRIVMSG")
 			cmd_privmsg(user, params);
 		else if (command == "NOTICE")
@@ -210,39 +208,6 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 		}
 		else
 			send_err(user, ERR_NOSUCHCHANNEL, "No such channel");
-	}
-}
-
-void	Server::cmd_names(User &user, std::vector<std::string> params)
-{
-	if (params.size() == 0)
-	{
-		if (!_rooms.empty())
-		{
-			for (unsigned long i = 0; i < _rooms.size(); i++)
-			{
-				if (_rooms[i].get_name() == "")
-					continue;
-				send_msg(user, RPL_NONE, _rooms[i].get_name());
-				send_msg(user, RPL_NAMREPLY, "Users in the room : " + _rooms[user.get_room_idx()].get_user_list());
-			}
-		}
-	}
-	else
-	{
-		if (params[0][0] == '#')
-		{
-			send_msg(user, RPL_NONE, "Room: " + params[0]);
-			if (find_room_idx(params[0]) != -1)
-			{
-				send_msg(user, RPL_NAMREPLY, "Users in the room : " + _rooms[user.get_room_idx()].get_user_list());
-				_rooms[user.get_room_idx()].get_user_list();
-			}
-			else
-				send_err(user, ERR_NOSUCHCHANNEL, "invalid room");
-		}
-		else
-			send_err(user, ERR_NOSUCHCHANNEL, "invalid room");
 	}
 }
 
