@@ -193,7 +193,7 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params)
 		send_err(user, 441, params[1] + " :No such nickname");
 	else {
 		_rooms[room_idx].remove_user(params[1]);
-		send_msg(user, RPL_NONE, "kicked user :" + params[1]);
+		send_msg(user, RPL_NONE, "KICK :" + params[1]);
 	}
 }
 
