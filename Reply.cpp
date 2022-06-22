@@ -20,7 +20,7 @@ void	Server::send_user_info(User user, std::string msg)
 {
 	std::stringstream ss;
 	ss << "[" << user.get_nickname() << "!" << user.get_username() << "@" << "irc.4-24.kr]";
-	send_msg(user, 123, msg + ss.str());
+	send_msg(user, RPL_MOTDSTART, msg + ss.str());
 }
 
 void	Server::send_err(User user, int code, std::string message)
