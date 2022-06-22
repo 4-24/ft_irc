@@ -338,7 +338,7 @@ void	Server::cmd_ping(User &user, const Message &msg)
 {
 	std::string name = SERV;
 	if (msg.get_params().size() == 0)
-		send_err(user, ERR_NOORIGIN, " :No origin specified");
+		send_err(user, ERR_NOORIGIN, "No origin specified");
 	else
 		send_pong(user, msg.get_params()[0]);
 }
