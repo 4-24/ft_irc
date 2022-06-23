@@ -219,7 +219,6 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 	{
 		if (params[0][0] == '#')
 		{
-			std::cout << user.get_room_idx() << "\n";
 			if (user.get_room_idx() != -1)
 			{
 				_rooms[user.get_room_idx()].remove_user(user);
