@@ -50,13 +50,13 @@ void	Server::send_notice_to_room(User &from, int idx, std::string message)
 
 void	Server::send_privmsg(User &to, User &from, std::string msg)
 {
-	std::string res = from.prefix() + " PRIVMSG " + from.get_nickname() + " " + ":" + msg + "\n";
+	std::string res = ":" + from.prefix() + " PRIVMSG " + from.get_nickname() + " " + ":" + msg + "\n";
 	send(to.get_fd(), res.c_str(), res.size(), SO_NOSIGPIPE);
 }
 
 void	Server::send_notice(User &to, User &from, std::string msg)
 {
-	std::string res = from.prefix() + " NOTICE " + from.get_nickname() + " " + ":" + msg + "\n";
+	std::string res = ":" + from.prefix() + " NOTICE " + from.get_nickname() + " " + ":" + msg + "\n";
 	send(to.get_fd(), res.c_str(), res.size(), SO_NOSIGPIPE);
 }
 
