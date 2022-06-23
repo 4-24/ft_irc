@@ -260,20 +260,10 @@ void	Server::cmd_notice(User &user, std::vector<std::string> params)
 	if (params.size() < 2)
 		send_err(user, ERR_NOTEXTTOSEND, params[0] + " " + params[1] + " :No text to send");
 
-	if  (params[0][0] == '#') // 방에서 메시지를 보낼 때
-	{
-		if (find_room_idx(params[0]) == -1)
-			send_err(user, ERR_CANNOTSENDTOCHAN, "NOTICE " + params[0] + " :Cannot send to channel");
-		else
-			send_notice_to_room(user, find_room_idx(params[0]), params[1]);
-	}
-	else // 유저에게 메시지를 보낼 때
-	{
-		if (find_nickname(params[0]) == -1)
-			send_err(user, ERR_NOSUCHNICK, "NOTICE " + params[0] + " :No such nickname");
-		else
-			send_notice(_users[find_nickname(params[0])], user, params[1]);
-	}
+	if (find_nickname(params[0]) == -1)
+		send_err(user, ERR_NOSUCHNICK, "NOTICE " + params[0] + " :No such nickname");
+	else
+		send_notice(_users[find_nickname(params[0])], user, params[1]);
 }
 
 void	Server::quit(User &user)
