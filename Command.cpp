@@ -163,17 +163,21 @@ void	Server::cmd_join(User &user, std::string param)
 					user.set_room_idx(_rooms.size());
 					room.add_user(user);
 					_rooms.push_back(room);
+					send_msg(user, RPL_NOTOPIC, param + " :No topic is set");
 				}
 				else // 방이 있을 때
 				{
+					if (_rooms[i].get_users().size() > 10)
+						send_err(user, ERR_CHANNELISFULL, param + " :You have joined too many channels");
 					user.set_room_idx(i);
 					_rooms[i].add_user(user);
+					send_msg(user, RPL_NOTOPIC, param + " :No topic is set");
 				}
 				_rooms[find_room_idx(param)].get_user_list();
 			}
 		}
 		else
-			send_err(user, ERR_NOSUCHCHANNEL, "invalid room");
+			send_err(user, ERR_NOSUCHCHANNEL, param + " :No such channel");
 	}
 }
 
@@ -228,43 +232,47 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 
 void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 {
+	if (!params.size() || params[0][0] == ':')
+		send_err(user, ERR_NORECIPIENT,  " :No recipient given (" + params[0] + ")");
 	if (params.size() < 2)
-		send_err(user, RPL_NONE, "Need more parameters");
+		send_err(user, ERR_NOTEXTTOSEND, params[0] + " " + params[1] + " :No text to send");
 
-	if (params[0][0] == '#') // 방에서 메시지를 보낼 때
+	if  (params[0][0] == '#') // 방에서 메시지를 보낼 때
 	{
 		if (find_room_idx(params[0]) == -1)
-			send_err(user, RPL_NONE, "No such room");
+			send_err(user, ERR_CANNOTSENDTOCHAN, "PRIVMSG " + params[0] + " :Cannot send to channel");
 		else
-			send_privmsg_to_room(user.get_fd(), find_room_idx(params[0]), params[1]);
+			send_privmsg_to_room(user, find_room_idx(params[0]), params[1]);
 	}
 	else // 유저에게 메시지를 보낼 때
 	{
 		if (find_nickname(params[0]) == -1)
-			send_err(user, RPL_NONE, "No such user");
+			send_err(user, ERR_NOSUCHNICK, "PRIVMSG " + params[0] + " :No such nickname");
 		else
-			send_privmsg(_users[find_nickname(params[0])], params[1]);
+			send_privmsg(_users[find_nickname(params[0])], user, params[1]);
 	}
 }
 
 void	Server::cmd_notice(User &user, std::vector<std::string> params)
 {
+	if (!params.size() || params[0][0] == ':')
+		send_err(user, ERR_NORECIPIENT,  " :No recipient given (" + params[0] + ")");
 	if (params.size() < 2)
-		send_err(user, RPL_NONE, "Need more parameters");
+		send_err(user, ERR_NOTEXTTOSEND, params[0] + " " + params[1] + " :No text to send");
 
-	if (params[0][0] == '#') // 방에서 메시지를 보낼 때
+	if  (params[0][0] == '#') // 방에서 메시지를 보낼 때
 	{
 		if (find_room_idx(params[0]) == -1)
-			return ;
+			send_err(user, ERR_CANNOTSENDTOCHAN, "NOTICE " + params[0] + " :Cannot send to channel");
 		else
-			send_notice_to_room(user.get_fd(), find_room_idx(params[0]), params[1]);
+			send_notice_to_room(user, find_room_idx(params[0]), params[1]);
 	}
 	else // 유저에게 메시지를 보낼 때
 	{
 		if (find_nickname(params[0]) == -1)
-			return ;
+			send_err(user, ERR_NOSUCHNICK, "NOTICE " + params[0] + " :No such nickname");
 		else
-			send_notice(_users[find_nickname(params[0])], params[1]);
+			send_notice(_users[find_nickname(params[0])], user, params[1]);
 	}
 }
 
