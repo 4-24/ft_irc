@@ -57,7 +57,6 @@ class Server
 		void							execute(User &user, Message message);
 		int								find_room_idx(std::string room_name);
 		bool							is_flooding(User &user);
-		void							replace_user(User &old_user, User &new_user);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(User &user, std::string param);
