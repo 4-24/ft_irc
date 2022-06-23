@@ -38,6 +38,8 @@ void	Server::execute(User &user, Message message)
 			cmd_privmsg(user, params);
 		else if (command == "NOTICE")
 			cmd_notice(user, params);
+		else if (command == "NAMES")
+			cmd_names(user, params);
 		else
 			send_err(user, ERR_UNKNOWNCOMMAND, "command not found");
 	}
@@ -266,6 +268,30 @@ void	Server::cmd_notice(User &user, std::vector<std::string> params)
 		send_err(user, ERR_NOSUCHNICK, "NOTICE " + params[0] + " :No such nickname");
 	else
 		send_notice(_users[find_nickname(params[0])], user, params[1]);
+}
+
+void	Server::cmd_names(User &user, std::vector<std::string> params)
+{
+	std::string msg = " :";
+
+	if (params.size() > 1)
+		send_err(user, ERR_NEEDMOREPARAMS, "too many params");
+	else if (params.size() == 0)
+	{
+		for (size_t i = 0; i < _rooms.size(); i++)
+		{
+			msg += _rooms[i].get_name() + " : { ";
+			msg += _rooms[i].get_user_list() + "}" + ", ";
+		}
+		msg += " * : {" + get_wait_list() + "}";
+	}
+	else if (params.size() == 1)
+	{
+		int i = find_room_idx(params[0]);
+		msg += _rooms[i].get_name() + ": { ";
+		msg += _rooms[i].get_user_list() + "}";
+	}
+	send_msg(user, RPL_NONE, msg);
 }
 
 void	Server::quit(User &user)
