@@ -3,6 +3,7 @@
 
 # include <string>
 # include <sstream>
+# include <sys/socket.h>
 # include "User.hpp"
 
 class	Room
@@ -18,6 +19,7 @@ class	Room
 		void				add_user(User &user);
 		void				remove_user(std::string name);
 		void				remove_user(User &user);
+		void				send_all(std::string msg);
 
 		std::string			get_name() const;
 		std::vector<User *>	get_users() const;

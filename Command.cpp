@@ -163,6 +163,7 @@ void	Server::cmd_join(User &user, std::string param)
 					user.set_room_idx(_rooms.size());
 					room.add_user(user);
 					_rooms.push_back(room);
+					room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
 					send_msg(user, RPL_NOTOPIC, param + " :No topic is set");
 				}
 				else // 방이 있을 때
@@ -171,6 +172,7 @@ void	Server::cmd_join(User &user, std::string param)
 						send_err(user, ERR_CHANNELISFULL, param + " :You have joined too many channels");
 					user.set_room_idx(i);
 					_rooms[i].add_user(user);
+					_rooms[i].send_all(":" + user.get_nickname() + " JOIN " + _rooms[i].get_name() + "\n");
 					send_msg(user, RPL_NOTOPIC, param + " :No topic is set");
 				}
 				_rooms[find_room_idx(param)].get_user_list();
@@ -217,6 +219,7 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 	{
 		if (params[0][0] == '#')
 		{
+			std::cout << user.get_room_idx() << "\n";
 			if (user.get_room_idx() != -1)
 			{
 				_rooms[user.get_room_idx()].remove_user(user);

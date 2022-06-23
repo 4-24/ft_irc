@@ -44,6 +44,15 @@ std::string	Room::get_user_list()
 	return ss.str();
 }
 
+void	Room::send_all(std::string msg)
+{
+	if (_users.size() > 0)
+	{
+		for (unsigned long i = 0; i < _users.size(); i++)
+			send(_users[i]->get_fd(), msg.c_str(), msg.size(), 0);
+	}
+}
+
 std::string	Room::get_name() const
 {
 	return (_name);
