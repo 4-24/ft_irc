@@ -98,9 +98,9 @@ void	Server::cmd_user(User &user, std::vector<std::string> params)
 			user.set_username(params[0]);
 			user.set_realname(params[3]);
 		}
-		else // 기존에 등록된 유저로 로그인
+		else
 		{
-			replace_user(_users[find_username(params[0])], user);
+			send_err(user, ERR_ALREADYREGISTRED, "You may not reregister");
 		}
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
@@ -299,20 +299,6 @@ bool	Server::is_flooding(User &user)
 	ss << user.get_message_timeout();
 	send_err(user, ERR_FLOOD, "flood detected, please wait " + ss.str() + " seconds");
 	return true;
-}
-
-void	Server::replace_user(User &old_user, User &new_user)
-{
-	int new_idx = find_user_idx(new_user.get_fd());
-	int old_fd = old_user.get_fd();
-
-	old_user.set_fd(new_user.get_fd());
-	_users.erase(_users.begin() + new_idx); // 새로운 유저 삭제
-	send_msg(old_user, RPL_NONE, "Goodbye!");
-	close(old_fd);
-	_fds.erase(_fds.begin() + find_user_idx(old_fd));
-	std::cout << "User " << old_fd << " disconnected." << std::endl;
-	send_msg(new_user, RPL_ISON, "user login: " + new_user.get_nickname());
 }
 
 void	Server::cmd_ping(User &user, const Message &msg)
