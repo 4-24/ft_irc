@@ -186,3 +186,8 @@ void	User::set_admin(bool admin)
 {
 	_is_admin = admin;
 }
+
+std::vector<int>	User::get_rooms() const
+{
+	return _rooms;
+}

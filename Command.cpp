@@ -226,7 +226,15 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 
 void	Server::cmd_part(User &user, std::vector<std::string> params)
 {
-	int	room_idx = user.get_room_idx();
+	if (params.size() < 1)
+		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));
+
+	std::vector<std::string> dests = split(params[0],",");
+
+	for (unsigned long i = 0; i < rooms.size(); i++)
+
+
+
 
 	if (params.size() < 1)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));

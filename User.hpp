@@ -52,6 +52,7 @@ class User
 		std::string	get_username() const;
 		std::string	get_realname() const;
 		int			get_room(int i) const;
+		std::vector<int>	get_rooms() const;
 		time_t		get_last_message_time() const;
 		time_t		get_message_timeout() const;
 		bool		is_admin() const;
