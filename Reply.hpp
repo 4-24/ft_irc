@@ -38,6 +38,7 @@
 
 # define RPL_WELCOME(nick)							":ircserv 001 " + nick + " :Welcome to the Internet Relay Network " + nick + "\n"
 # define RPL_UMODEIS(nick, mode)					":ircserv 221 " + nick + " " + mode + "\n"
+# define RPL_NONE(nick, message)					":ircserv 300" + nick + " :" + message + "\n"
 # define RPL_AWAY(nick, message)					":ircserv 301 * " + nick + " :" + message + "\n"
 # define RPL_UNAWAY(nick)							":ircserv 305 * " + nick + " :You are no longer marked as being away\n"
 # define RPL_NOWAWAY(nick)							":ircserv 306 * " + nick + " :You have been marked as being away\n"

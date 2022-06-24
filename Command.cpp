@@ -52,16 +52,16 @@ void	Server::execute(User &user, Message message)
 void	Server::cmd_pass(User &user, std::vector<std::string> params)
 {
 	if (user.is_authenticated())
-		send_err(user, ERR_ALREADYREGISTRED, "You may not reregister");
+		send_err(user, ERR_ALREADYREGISTRED(user.get_nickname()));
 	if (params.size() == 1)
 	{
 		if (params[0] == _password)
 		{
 			user.set_authenticated(true);
-			send_msg(user, RPL_NONE, "Authenticated...");
+			send_msg(user, RPL_NONE(user.get_nickname(), "Authenticated..."));
 		}
 		else
-			send_err(user, ERR_PASSWDMISMATCH, "password incorrect");
+			send_err(user, ERR_PASSWDMISMATCH(user.get_nickname()));
 	}
 }
 
