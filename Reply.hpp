@@ -9,10 +9,13 @@
  */
 
 # define ERR_NOSUCHNICK(nick)						":ircserv 401 " + nick + " :No such nick/channel\n"
+# define ERR_NOSUCHSERVER(serv)						":ircserv 402 " + serv + " :No such server\n"
 # define ERR_NOSUCHCHANNEL(nick, channel)			":ircserv 403 " + nick + " " + channel + " :No such channel\n"
 # define ERR_CANNOTSENDTOCHAN(nick, channel)		":ircserv 404 " + nick + " " + channel + " :Cannot send to channel\n"
 # define ERR_TOOMANYCHANNELS(nick, channel)			":ircserv 405 " + nick + " " + channel + " :You have joined too many channels\n"
+# define ERR_NOORIGIN								":ircserv 409 * :No origin specified\n"
 # define ERR_NORECIPIENT(nick, command)				":ircserv 411 " + nick + " :No recipient given " + command + "\n"
+# define ERR_UNKNOWNCOMMAND							":ircserv 421 * :Command not found\n"
 # define ERR_NOTEXTTOSEND(nick)						":ircserv 412 " + nick + " :No text to send\n"
 # define ERR_NONICKNAMEGIVEN						":ircserv 431 :No nickname given\n"
 # define ERR_ERRONEUSNICKNAME(nick)					":ircserv 432 " + nick + " :Erroneus nickname\n"
@@ -31,6 +34,7 @@
 # define ERR_NOOPERHOST(nick)						":ircserv 491 " + nick + " :No O-lines for your host\n"
 # define ERR_UMODEUNKNOWNFLAG(nick, channel)		":ircserv 501 " + nick + " " + channel + " :Unknown MODE flag\n"
 # define ERR_USERSDONTMATCH(nick)					":ircserv 502 " + nick + " :Cant change mode for other users\n"
+# define ERR_FLOOD(sec)								":ircserv 504 * :flood detected, please wait " + sec + " seconds"
 
 /*
  *  Command responses
@@ -38,7 +42,7 @@
 
 # define RPL_WELCOME(nick)							":ircserv 001 " + nick + " :Welcome to the Internet Relay Network " + nick + "\n"
 # define RPL_UMODEIS(nick, mode)					":ircserv 221 " + nick + " " + mode + "\n"
-# define RPL_NONE(nick, message)					":ircserv 300" + nick + " :" + message + "\n"
+# define RPL_NONE(message)							":ircserv 300 * :" + message + "\n"
 # define RPL_AWAY(nick, message)					":ircserv 301 * " + nick + " :" + message + "\n"
 # define RPL_UNAWAY(nick)							":ircserv 305 * " + nick + " :You are no longer marked as being away\n"
 # define RPL_NOWAWAY(nick)							":ircserv 306 * " + nick + " :You have been marked as being away\n"

@@ -8,10 +8,10 @@ void	Server::send_msg(User user, std::string message)
 }
 
 void	Server::send_motd(User user)
-
-	sendMessage(RPL_MOTDSTART(user.get_nickname()), user.get_fd());
-	sendMessage(RPL_MOTD(user.get_nickname(), (std::string)"*** 42Seoul 4-24 network ***"), user.get_fd());
-	sendMessage(RPL_ENDOFMOTD(user.get_nickname()), user.get_fd());
+{
+	send_msg(user, RPL_MOTDSTART(user.get_nickname()));
+	send_msg(user, RPL_MOTD(user.get_nickname(), (std::string)"*** 42Seoul 4-24 network ***"));
+	send_msg(user, RPL_ENDOFMOTD(user.get_nickname()));
 }
 
 void	Server::send_err(User user, std::string message)

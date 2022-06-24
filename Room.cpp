@@ -3,6 +3,8 @@
 Room::Room (std::string name)
 {
 	_name = name;
+	_topic = "";
+	_key = "";
 }
 
 Room::~Room () {}
@@ -51,6 +53,26 @@ void	Room::send_all(std::string msg)
 		for (unsigned long i = 0; i < _users.size(); i++)
 			send(_users[i]->get_fd(), msg.c_str(), msg.size(), 0);
 	}
+}
+
+void	Room::set_topic(std::string topic)
+{
+	_topic = topic;
+}
+
+void	Room::set_key(std::string key)
+{
+	_key = key;
+}
+
+std::string	Room::get_topic() const
+{
+	return _topic;
+}
+
+std::string	Room::get_key() const
+{
+	return _key;
 }
 
 std::string	Room::get_name() const

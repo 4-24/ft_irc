@@ -26,6 +26,7 @@
 # define DIM "\x1b[2m"
 # define RESET "\x1b[0m"
 # define MSG_LEN 1024
+# define MAX_ROOM_USER 30
 # define SUPER_NICK "klp"
 # define SUPER_PASS "424"
 # define SERV "ircserv"
@@ -58,13 +59,15 @@ class Server
 		int								find_room_idx(std::string room_name);
 		bool							is_flooding(User &user);
 		std::string						get_wait_list();
+		bool							is_valid_room_name(const std::string &name);
+		std::vector<std::string>		split(std::string input, char delimiter);
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(User &user, std::string param);
 		void	cmd_user(User &user, std::vector<std::string> params);
 		void	cmd_oper(User &user, std::vector<std::string> params);
 		void	cmd_mode(User &user, std::vector<std::string> params);
-		void	cmd_join(User &user, std::string param);
+		void	cmd_join(User &user, std::vector<std::string> params);
 		void	cmd_kick(User &user, std::vector<std::string> params);
 		void	cmd_part(User &user, std::vector<std::string> params);
 		void	cmd_privmsg(User &user, std::vector<std::string> params);

@@ -21,7 +21,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "USER")
 			cmd_user(user, params);
 		else if (!user.is_authenticated() && !user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
-			send_err(user, ERR_NOTREGISTERED, "You have not registered. register first.");
+			send_err(user, ERR_NOTREGISTERED);
 		else if (is_flooding(user)) // 플러딩 체크
 			return ;
 		else if (command == "OPER")
@@ -29,7 +29,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "MODE")
 			cmd_mode(user, params);
 		else if (command == "JOIN")
-			cmd_join(user, params[0]);
+			cmd_join(user, params);
 		else if (command == "KICK")
 			cmd_kick(user, params);
 		else if (command == "PART")
@@ -41,7 +41,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "NAMES")
 			cmd_names(user, params);
 		else
-			send_err(user, ERR_UNKNOWNCOMMAND, "command not found");
+			send_err(user, ERR_UNKNOWNCOMMAND);
 	}
 	catch (std::runtime_error &e)
 	{
@@ -58,7 +58,7 @@ void	Server::cmd_pass(User &user, std::vector<std::string> params) // o.k
 		if (params[0] == _password)
 		{
 			user.set_authenticated(true);
-			send_msg(user, RPL_NONE(user.get_nickname(), "Authenticated..."));
+			send_msg(user, RPL_NONE((std::string)"Authenticated..."));
 		}
 		else
 			send_err(user, ERR_PASSWDMISMATCH(user.get_nickname()));
@@ -72,13 +72,13 @@ bool check_nick(std::string const &str) {
 
 void	Server::cmd_nick(User &user, std::string param) // o.k
 {
-	if (!param || param == "")
+	if (param == "")
 		send_err(user, ERR_NONICKNAMEGIVEN);
 	if (!check_nick(param)) // 잘못된 닉네임
 		send_err(user, ERR_ERRONEUSNICKNAME(param));
 	else if (find_nickname(param) != -1) // 이미 존재하는 닉네임
 		send_err(user, ERR_NICKNAMEINUSE(param));
-	else if (find_nickname(param) != -1 && _users[find_nickname].is_registered())
+	else if (find_nickname(param) != -1 && _users[find_nickname(param)].is_registered())
 		send_err(user, ERR_NICKCOLLISION(param));
 	else // 정상적인 닉네임
 	{
@@ -94,9 +94,9 @@ void	Server::cmd_nick(User &user, std::string param) // o.k
 void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
 {
 	if (params.size() != 4)
-		send_err(user, ERR_NEEDMOREPARAMS(user.nickname(), "USER"));
+		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "USER"));
 	if (user.is_registered()) // 이미 등록된 유저
-		send_err(user, ERR_ALREADYREGISTRED(user.nickname()));
+		send_err(user, ERR_ALREADYREGISTRED(user.get_nickname()));
 	else // 정상적인 유저
 	{
 		if (find_username(params[0]) == -1)
@@ -106,7 +106,7 @@ void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
 		}
 		else
 		{
-			send_err(user, ERR_ALREADYREGISTRED(user.nickname()));
+			send_err(user, ERR_ALREADYREGISTRED(user.get_nickname()));
 		}
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
@@ -116,109 +116,124 @@ void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
 	}
 }
 
-void	Server::cmd_oper(User &user, std::vector<std::string> params)
+// void	Server::cmd_oper(User &user, std::vector<std::string> params)
+// {
+// 	int user_idx = find_user_idx(user.get_fd());
+
+// 	if (params.size() != 2)
+// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "OPER"));
+// 	if (params[0] != SUPER_NICK)
+// 		send_err(user, ERR_WRONGUSERNAME, "wrong host nick name");
+// 	if (params[1] != SUPER_PASS)
+// 		send_err(user, ERR_PASSWDMISMATCH, "wrong host password");
+// 	_users[user_idx].set_admin(true);
+// 	send_msg(user, RPL_YOUREOPER, "Operator privileges have been obtained");
+// 	std::cout << "\nUSER[" << user_idx << "] Operator privileges have been obtained\n" << std::endl;
+// }
+
+// void	Server::cmd_mode(User &user, std::vector<std::string> params)
+// {
+// 	int user_idx = find_user_idx(user.get_fd());
+
+// 	if (!_users[user_idx].is_admin())
+// 		send_err(user, ERR_NOPRIVILEGES, "you're not operator");
+// 	if (params[0].empty() || params[1].empty())
+// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
+// 	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
+// 	{
+// 		if (find_nickname(params[1]) == -1)
+// 			send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
+// 		if (params[0][0] == '+')
+// 			_users[find_nickname(params[1])].set_admin(true);
+// 		else
+// 			_users[find_nickname(params[1])].set_admin(false);
+// 	}
+// 	else
+// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
+// }
+
+void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but some part
 {
-	int user_idx = find_user_idx(user.get_fd());
+	std::vector<std::string> rooms;
+	std::vector<std::string> keys;
 
-	if (params.size() != 2)
-		send_err(user, ERR_NEEDMOREPARAMS, "OPER :usage : ./oper [nick] [password]");
-	if (params[0] != SUPER_NICK)
-		send_err(user, ERR_WRONGUSERNAME, "wrong host nick name");
-	if (params[1] != SUPER_PASS)
-		send_err(user, ERR_PASSWDMISMATCH, "wrong host password");
-	_users[user_idx].set_admin(true);
-	send_msg(user, RPL_YOUREOPER, "Operator privileges have been obtained");
-	std::cout << "\nUSER[" << user_idx << "] Operator privileges have been obtained\n" << std::endl;
-}
+	if (params.size() < 1)
+		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "JOIN"));
 
-void	Server::cmd_mode(User &user, std::vector<std::string> params)
-{
-	int user_idx = find_user_idx(user.get_fd());
+	rooms = split(params[0], ',');
+	if (params.size() == 2)
+		keys = split(params[1], ',');
 
-	if (!_users[user_idx].is_admin())
-		send_err(user, ERR_NOPRIVILEGES, "you're not operator");
-	if (params[0].empty() || params[1].empty())
-		send_err(user, ERR_NEEDMOREPARAMS, "MODE :usage : ./mode [option] [nick]");
-	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
+	for (unsigned long i = 0; i < rooms.size(); i++)
 	{
-		if (find_nickname(params[1]) == -1)
-			send_err(user, ERR_NOSUCHNICK, "that user does not exist");
-		if (params[0][0] == '+')
-			_users[find_nickname(params[1])].set_admin(true);
-		else
-			_users[find_nickname(params[1])].set_admin(false);
-	}
-	else
-		send_err(user, ERR_NEEDMOREPARAMS, "MODE :usage : ./mode [option] [nick]");
-}
-
-void	Server::cmd_join(User &user, std::string param) // o.k. but some part
-{
-	if (param.size() > 0)
-	{
-		if (param[0] == '#')
+		if (is_valid_room_name(rooms[i]) == false)
+			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
+		int j = find_room_idx(rooms[i]);
+		if (j == -1) // 방이 없을 때
 		{
-			if (user.get_room_idx() != -1) // 유저가 이미 방에 들어가있을 때
-				return ;
-			else
-			{
-				int i = find_room_idx(param);
-				if (i == -1) // 방이 없을 때
-				{
-					Room	room(param);
-					user.set_room_idx(_rooms.size());
-					room.add_user(user);
-					_rooms.push_back(room);
-					room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
-					send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
-				}
-				else // 방이 있을 때
-				{
-					if (_rooms[i].get_users().size() > 10)
-						send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[i].get_name()));
-					user.set_room_idx(i);
-					_rooms[i].add_user(user);
-					_rooms[i].send_all(":" + user.get_nickname() + " JOIN " + _rooms[i].get_name() + "\n");
-					send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[i].get_name()));
-				}
-				_rooms[find_room_idx(param)].get_user_list();
-			}
+			if (rooms.size() >= MAX_ROOM_USER)
+				send_err(user, ERR_TOOMANYCHANNELS(user.get_nickname(), rooms[i]));
+			Room room(rooms[i]);
+			if (keys.size() > i)
+				room.set_key(keys[i]);
+			user.set_room_idx(_rooms.size());
+			room.add_user(user);
+			_rooms.push_back(room);
+			room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
+			send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
+			send_msg(user, RPL_NAMREPLY(user.get_nickname(), room.get_name(), room.get_user_list()));
+			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), room.get_name()));
 		}
 		else
-			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), param));
+		{
+			if (keys.size() <= i || _rooms[j].get_key() != keys[i])
+				send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[j].get_name()));
+			if (_rooms[j].get_users().size() > 10)
+				send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[j].get_name()));
+			user.set_room_idx(j);
+			_rooms[j].add_user(user);
+			_rooms[j].send_all(":" + user.get_nickname() + " JOIN " + _rooms[j].get_name() + "\n");
+			if (_rooms[j].get_topic() == "")
+				send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[j].get_name()));
+			else
+				send_msg(user, RPL_TOPIC(user.get_nickname(), _rooms[j].get_name(), _rooms[j].get_topic()));
+			send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[j].get_name(), _rooms[j].get_user_list()));
+			send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[j].get_name()));
+			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[j].get_name()));
+		}
 	}
 }
 
-void	Server::cmd_kick(User &user, std::vector<std::string> params)
-{
-	int	room_idx = find_room_idx(params[0]);
+// void	Server::cmd_kick(User &user, std::vector<std::string> params)
+// {
+// 	int	room_idx = find_room_idx(params[0]);
 
-	if (params.size() < 2)
-		send_err(user, ERR_NEEDMOREPARAMS, "KICK :Not enough parameter");
-	else if (room_idx == -1)
-		send_err(user, 403, params[0] + " :No such channel");
-	else if (!user.is_admin())
-		send_err(user, 482, params[0] + " :You're not channel operator");
-	else if (room_idx != user.get_room_idx())
-		send_err(user, 482, params[0] + " :You're not on that channel");
-	else if (_rooms[room_idx].is_user(params[1]) == false)
-		send_err(user, 441, params[1] + " :No such nickname");
-	else {
-		_rooms[room_idx].remove_user(params[1]);
-		send_msg(user, RPL_NONE, "KICK :" + params[1]);
-	}
-}
+// 	if (params.size() < 2)
+// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "KICK"));
+// 	else if (room_idx == -1)
+// 		send_err(user, 403, params[0] + " :No such channel");
+// 	else if (!user.is_admin())
+// 		send_err(user, 482, params[0] + " :You're not channel operator");
+// 	else if (room_idx != user.get_room_idx())
+// 		send_err(user, 482, params[0] + " :You're not on that channel");
+// 	else if (_rooms[room_idx].is_user(params[1]) == false)
+// 		send_err(user, 441, params[1] + " :No such nickname");
+// 	else {
+// 		_rooms[room_idx].remove_user(params[1]);
+// 		send_msg(user, RPL_NONE("KICK :" + params[1]));
+// 	}
+// }
 
 void	Server::cmd_part(User &user, std::vector<std::string> params)
 {
 	int	room_idx = user.get_room_idx();
 
 	if (params.size() < 1)
-		send_err(user, ERR_NEEDMOREPARAMS, "PART :Not enough parameter");
+		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));
 	else
 	{
 		if (find_room_idx(params[0]))
-			send_err(user, ERR_NOSUCHCHANNEL, params[0] + " :No such channel");
+			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 		else if (room_idx != -1)
 		{
 			_rooms[room_idx].remove_user(user.get_nickname());
@@ -226,28 +241,28 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 			_rooms[room_idx].send_all(":" + user.get_nickname() + " PART " + _rooms[room_idx].get_name() + "\n");
 		}
 		else
-			send_err(user, ERR_NOTONCHANNEL, params[0] + " :You're not on that channel");
+			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
 	}
 }
 
 void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 {
 	if (!params.size() || params[0][0] == ':')
-		send_err(user, ERR_NORECIPIENT,  " :No recipient given (" + params[0] + ")");
+		send_err(user, ERR_NORECIPIENT(user.get_nickname(), params[0]));
 	if (params.size() < 2)
-		send_err(user, ERR_NOTEXTTOSEND, params[0] + " " + params[1] + " :No text to send");
+		send_err(user, ERR_NOTEXTTOSEND(user.get_nickname()));
 
 	if  (params[0][0] == '#') // 방에서 메시지를 보낼 때
 	{
 		if (find_room_idx(params[0]) == -1)
-			send_err(user, ERR_CANNOTSENDTOCHAN, "PRIVMSG " + params[0] + " :Cannot send to channel");
+			send_err(user, ERR_CANNOTSENDTOCHAN(user.get_nickname(), params[0]));
 		else
 			send_privmsg_to_room(user, find_room_idx(params[0]), params[1]);
 	}
 	else // 유저에게 메시지를 보낼 때
 	{
 		if (find_nickname(params[0]) == -1)
-			send_err(user, ERR_NOSUCHNICK, "PRIVMSG " + params[0] + " :No such nickname");
+			send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
 		else
 			send_privmsg(_users[find_nickname(params[0])], user, params[1]);
 	}
@@ -256,12 +271,12 @@ void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 void	Server::cmd_notice(User &user, std::vector<std::string> params)
 {
 	if (!params.size() || params[0][0] == ':')
-		send_err(user, ERR_NORECIPIENT,  " :No recipient given (" + params[0] + ")");
+		send_err(user, ERR_NORECIPIENT(user.get_nickname(), params[0]));
 	if (params.size() < 2)
-		send_err(user, ERR_NOTEXTTOSEND, params[0] + " " + params[1] + " :No text to send");
+		send_err(user, ERR_NOTEXTTOSEND(user.get_nickname()));
 
 	if (find_nickname(params[0]) == -1)
-		send_err(user, ERR_NOSUCHNICK, "NOTICE " + params[0] + " :No such nickname");
+		send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
 	else
 		send_notice(_users[find_nickname(params[0])], user, params[1]);
 }
@@ -271,7 +286,7 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 	std::string msg = " :";
 
 	if (params.size() > 1)
-		send_err(user, ERR_NEEDMOREPARAMS, "NAMES :Not enough parameter");
+		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "NAMES"));
 	else if (params.size() == 0)
 	{
 		for (size_t i = 0; i < _rooms.size(); i++)
@@ -287,14 +302,14 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 		msg += _rooms[i].get_name() + ": { ";
 		msg += _rooms[i].get_user_list() + "}";
 	}
-	send_msg(user, RPL_NONE, msg);
+	send_msg(user, RPL_NONE(msg));
 }
 
 void	Server::quit(User &user)
 {
 	if (user.get_room_idx() != -1)
 		cmd_part(user, std::vector<std::string>(0));
-	send_msg(user, RPL_NONE, "Goodbye!");
+	send_msg(user, RPL_NONE((std::string)"Goodbye!"));
 	close(user.get_fd());
 	std::cout << "User " << user.get_fd() << " disconnected." << std::endl;
 
@@ -319,7 +334,7 @@ bool	Server::is_flooding(User &user)
 		user.set_message_timeout(user.get_message_timeout() * 2);
 	std::stringstream ss;
 	ss << user.get_message_timeout();
-	send_err(user, ERR_FLOOD, "flood detected, please wait " + ss.str() + " seconds");
+	send_err(user, ERR_FLOOD(ss.str()));
 	return true;
 }
 
@@ -327,7 +342,7 @@ void	Server::cmd_ping(User &user, const Message &msg)
 {
 	std::string name = SERV;
 	if (msg.get_params().size() == 0)
-		send_err(user, ERR_NOORIGIN, "No origin specified");
+		send_err(user, ERR_NOORIGIN);
 	else
 		send_pong(user, msg.get_params()[0]);
 }
@@ -335,5 +350,21 @@ void	Server::cmd_ping(User &user, const Message &msg)
 void	Server::cmd_pong(User &user, const Message &msg)
 {
 	if (msg.get_params().size() <= 0 || msg.get_params()[0] != SERV)
-		return (send_err(user, ERR_NOSUCHSERVER, msg.get_params().size() > 0 ? msg.get_params()[0] : ""));
+	{
+		if (msg.get_params().size() > 0)
+			send_err(user, ERR_NOSUCHSERVER(msg.get_params()[0]));
+		else
+			send_err(user, ERR_NOSUCHSERVER((std::string)""));
+	}
+}
+
+bool	Server::is_valid_room_name(const std::string &name)
+{
+	if (name.length() > 50 || name.find_first_of("&#+!") != 0)
+		return false;
+	for (unsigned int i = 0; i < name.length(); i++) {
+		if (isspace(name[i]) || iscntrl(name[i]) || name[i] == ',')
+			return false;
+	}
+	return true;
 }

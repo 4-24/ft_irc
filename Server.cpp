@@ -56,7 +56,7 @@ void	Server::create_poll(int fd, bool is_server)
 	{
 		_users.push_back(User(fd));
 		if (_password != "")
-			send_msg(_users.back(), RPL_NONE, "Please enter ircserv password.");
+			send_msg(_users.back(), RPL_NONE((std::string)"Please enter ircserv password."));
 	}
 }
 
@@ -157,4 +157,13 @@ int	Server::find_username(std::string name)
 			return i;
 
 	return -1;
+}
+
+std::vector<std::string>	Server::split(std::string input, char delimiter) {
+	std::vector<std::string>	result;
+	std::stringstream			ss(input);
+	std::string					tmp;
+
+	while (getline(ss, tmp, delimiter)) result.push_back(tmp);
+	return result;
 }
