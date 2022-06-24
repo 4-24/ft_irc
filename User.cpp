@@ -108,10 +108,8 @@ int	User::get_room(int i) const
 {
 	for (size_t j = 0; j < _rooms.size(); i++)
 		if (_rooms[j] == i)
-		{
-			return _rooms[i];
-		}
-
+			return j;
+	return -1
 }
 
 Message	User::get_message() const
