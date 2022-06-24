@@ -175,11 +175,11 @@ void	Server::cmd_join(User &user, std::string param) // o.k. but some part
 				else // 방이 있을 때
 				{
 					if (_rooms[i].get_users().size() > 10)
-						send_err(user, ERR_CHANNELISFULL, param + " :You have joined too many channels");
+						send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[i].get_name()));
 					user.set_room_idx(i);
 					_rooms[i].add_user(user);
 					_rooms[i].send_all(":" + user.get_nickname() + " JOIN " + _rooms[i].get_name() + "\n");
-					send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
+					send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[i].get_name()));
 				}
 				_rooms[find_room_idx(param)].get_user_list();
 			}
