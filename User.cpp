@@ -1,4 +1,5 @@
 # include "User.hpp"
+# include "Room.hpp"
 
 User::User(int fd)
 {
@@ -6,7 +7,6 @@ User::User(int fd)
 	_is_registered = false;
 	_is_authenticated = false;
 	_is_admin = false;
-	_rooms = NULL;
 	_last_message_time = time(NULL);
 	_message_timeout = 1;
 	_nickname = "";
@@ -27,17 +27,17 @@ void	User::add_buffer(std::string message)
 	std::cout << "------------------------------------" << std::endl;
 }
 
-void	User::add_room(int i)
+void	User::add_room(Room *room)
 {
-	_rooms.push_back(i);
+	_rooms.push_back(room);
 }
 
-void	User::delete_room(int i);
+void	User::delete_room(std::string name)
 {
-	for (size_t j = 0; j < _users.size(); i++)
-		if (_rooms[j] == i)
+	for (size_t i = 0; i < _rooms.size(); i++)
+		if (_rooms[i]->get_name() == name)
 		{
-			_users.erase(_users.begin() + j);
+			_rooms.erase(_rooms.begin() + i);
 			break;
 		}
 }
@@ -104,12 +104,12 @@ int	User::get_fd() const
 	return (_fd);
 }
 
-int	User::get_room(int i) const
+int	User::get_room(std::string name) const
 {
-	for (size_t j = 0; j < _rooms.size(); i++)
-		if (_rooms[j] == i)
-			return j;
-	return -1
+	for (size_t i = 0; i < _rooms.size(); i++)
+		if (_rooms[i]->get_name() == name)
+			return i;
+	return -1;
 }
 
 Message	User::get_message() const
@@ -187,7 +187,7 @@ void	User::set_admin(bool admin)
 	_is_admin = admin;
 }
 
-std::vector<int>	User::get_rooms() const
+std::vector<Room *>	User::get_rooms() const
 {
 	return _rooms;
 }

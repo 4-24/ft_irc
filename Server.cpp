@@ -97,7 +97,7 @@ std::string	Server::get_wait_list()
 	{
 		for (unsigned long i = 0; i < _users.size(); i++)
 		{
-			if (_users[i].get_room_idx() == -1)
+			if (_users[i].get_rooms().empty())
 				ss << _users[i].get_nickname() << " ";
 		}
 	}

@@ -4,7 +4,7 @@
 # include <string>
 # include <sstream>
 # include <sys/socket.h>
-# include "User.hpp"
+#include "User.hpp"
 
 class	Room
 {
@@ -24,6 +24,7 @@ class	Room
 		void				send_all(std::string msg);
 		void				set_topic(std::string topic);
 		void				set_key(std::string key);
+
 
 		std::string			get_name() const;
 		std::string			get_topic() const;
