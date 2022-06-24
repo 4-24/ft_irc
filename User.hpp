@@ -11,7 +11,7 @@ class User
 		bool		_is_registered;
 		bool		_is_authenticated;
 		bool		_is_admin;
-		int			_room_idx;
+		std::vector<int>	_rooms;
 		std::string	_buffer;
 		std::string	_nickname;
 		std::string	_username;
@@ -26,6 +26,8 @@ class User
 
 		void		setup_message();
 		void		add_buffer(std::string message);
+		void		add_room(int i);
+		void		delete_room(int i);
 		void		clear_message();
 
 		bool		is_registered();
@@ -38,7 +40,6 @@ class User
 		void		set_nickname(std::string nickname);
 		void		set_username(std::string username);
 		void		set_realname(std::string realname);
-		void		set_room_idx(int room_idx);
 		void		set_last_message_time(time_t last_message_time);
 		void		set_message_timeout(time_t message_timeout);
 		void		set_admin(bool admin);
@@ -50,7 +51,7 @@ class User
 		std::string	get_nickname() const;
 		std::string	get_username() const;
 		std::string	get_realname() const;
-		int			get_room_idx() const;
+		int			get_room(int i) const;
 		time_t		get_last_message_time() const;
 		time_t		get_message_timeout() const;
 		bool		is_admin() const;

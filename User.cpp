@@ -6,7 +6,7 @@ User::User(int fd)
 	_is_registered = false;
 	_is_authenticated = false;
 	_is_admin = false;
-	_room_idx = -1;
+	_rooms = NULL;
 	_last_message_time = time(NULL);
 	_message_timeout = 1;
 	_nickname = "";
@@ -25,6 +25,21 @@ void	User::add_buffer(std::string message)
 	std::cout << "------------------------------------" << std::endl;
 	std::cout << "message: " << _buffer << std::endl;
 	std::cout << "------------------------------------" << std::endl;
+}
+
+void	User::add_room(int i)
+{
+	_rooms.push_back(i);
+}
+
+void	User::delete_room(int i);
+{
+	for (size_t j = 0; j < _users.size(); i++)
+		if (_rooms[j] == i)
+		{
+			_users.erase(_users.begin() + j);
+			break;
+		}
 }
 
 void	User::clear_message()
@@ -89,9 +104,14 @@ int	User::get_fd() const
 	return (_fd);
 }
 
-int	User::get_room_idx() const
+int	User::get_room(int i) const
 {
-	return _room_idx;
+	for (size_t j = 0; j < _rooms.size(); i++)
+		if (_rooms[j] == i)
+		{
+			return _rooms[i];
+		}
+
 }
 
 Message	User::get_message() const
@@ -152,11 +172,6 @@ void	User::set_authenticated(bool authenticated)
 void	User::set_registered(bool registered)
 {
 	_is_registered = registered;
-}
-
-void	User::set_room_idx(int room_idx)
-{
-	_room_idx = room_idx;
 }
 
 void	User::set_last_message_time(time_t last_message_time)

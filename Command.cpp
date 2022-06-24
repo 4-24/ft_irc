@@ -176,7 +176,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 			Room room(rooms[i]);
 			if (keys.size() > i)
 				room.set_key(keys[i]);
-			user.set_room_idx(_rooms.size());
+			user.add_room(_rooms.size());
 			room.add_user(user);
 			_rooms.push_back(room);
 			room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
@@ -190,7 +190,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 				send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[j].get_name()));
 			if (_rooms[j].get_users().size() > 10)
 				send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[j].get_name()));
-			user.set_room_idx(j);
+			user.add_room(j);
 			_rooms[j].add_user(user);
 			_rooms[j].send_all(":" + user.get_nickname() + " JOIN " + _rooms[j].get_name() + "\n");
 			if (_rooms[j].get_topic() == "")
@@ -237,7 +237,7 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 		else if (room_idx != -1)
 		{
 			_rooms[room_idx].remove_user(user.get_nickname());
-			user.set_room_idx(-1);
+			user.delete_room(room_idx);
 			_rooms[room_idx].send_all(":" + user.get_nickname() + " PART " + _rooms[room_idx].get_name() + "\n");
 		}
 		else
