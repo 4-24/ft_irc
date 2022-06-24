@@ -49,7 +49,7 @@ void	Server::execute(User &user, Message message)
 	}
 }
 
-void	Server::cmd_pass(User &user, std::vector<std::string> params)
+void	Server::cmd_pass(User &user, std::vector<std::string> params) // o.k
 {
 	if (user.is_authenticated())
 		send_err(user, ERR_ALREADYREGISTRED(user.get_nickname()));
@@ -73,7 +73,7 @@ bool check_nick(std::string const &str) {
 void	Server::cmd_nick(User &user, std::string param)
 {
 	if (!check_nick(param)) // 잘못된 닉네임
-		send_err(user, ERR_ERRONEUSNICKNAME, "invalid nick");
+		send_err(user, ERR_ERRONEUSNICKNAME(user.get_nickname()));
 	else if (find_nickname(param) != -1) // 이미 존재하는 닉네임
 		send_err(user, ERR_NICKNAMEINUSE, "nickname already exists");
 	else // 정상적인 닉네임
