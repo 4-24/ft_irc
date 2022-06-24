@@ -74,15 +74,14 @@ class Server
 		void	cmd_ping(User &user, const Message &msg);
 		void	cmd_pong(User &user, const Message &msg);
 
-		void							send_msg(User user, int code, std::string message);
-		void							send_err(User user, int code, std::string message);
+		void							send_msg(User user, std::string message);
+		void							send_err(User user, std::string message);
 		void							send_motd(User user);
 		void							send_privmsg_to_room(User &from, int idx, std::string message);
 		void							send_notice_to_room(User &from, int idx, std::string message);
 		void							send_privmsg(User &to, User &from, std::string msg);
 		void							send_notice(User &to, User &from, std::string msg);
 		void							send_pong(User &user, std::string msg);
-		std::string						header(int code, User &user);
 };
 
 #endif

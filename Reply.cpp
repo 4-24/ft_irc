@@ -2,20 +2,19 @@
 # include "Server.hpp"
 
 
-
-void	Server::send_msg(User user, int code, std::string message)
+void	Server::send_msg(User user, std::string message)
 {
 	send(user.get_fd(), message.c_str(), message.size(), 0);
 }
 
 void	Server::send_motd(User user)
-{
+
 	sendMessage(RPL_MOTDSTART(user.get_nickname()), user.get_fd());
 	sendMessage(RPL_MOTD(user.get_nickname(), (std::string)"*** 42Seoul 4-24 network ***"), user.get_fd());
 	sendMessage(RPL_ENDOFMOTD(user.get_nickname()), user.get_fd());
 }
 
-void	Server::send_err(User user, int code, std::string message)
+void	Server::send_err(User user, std::string message)
 {
 	send(user.get_fd(), message.c_str(), message.size(), 0);
 	throw std::runtime_error((message + "\n").c_str());
