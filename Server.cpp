@@ -89,6 +89,21 @@ int	Server::find_fd_idx(int fd)
 	return -1;
 }
 
+std::string	Server::get_wait_list()
+{
+	std::stringstream ss;
+
+	if (_users.size() > 0)
+	{
+		for (unsigned long i = 0; i < _users.size(); i++)
+		{
+			if (_users[i].get_room_idx() == -1)
+				ss << _users[i].get_nickname() << " ";
+		}
+	}
+	return ss.str();
+}
+
 void	Server::chat(User &user)
 {
 	char		buff[MSG_LEN];
@@ -132,7 +147,6 @@ int	Server::find_nickname(std::string name)
 	for (size_t i = 0; i < _users.size(); i++)
 		if (_users[i].get_nickname() == name)
 			return i;
-
 	return -1;
 }
 

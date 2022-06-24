@@ -57,6 +57,7 @@ class Server
 		void							execute(User &user, Message message);
 		int								find_room_idx(std::string room_name);
 		bool							is_flooding(User &user);
+		std::string						get_wait_list();
 
 		void	cmd_pass(User &user, std::vector<std::string> params);
 		void	cmd_nick(User &user, std::string param);
@@ -68,6 +69,7 @@ class Server
 		void	cmd_part(User &user, std::vector<std::string> params);
 		void	cmd_privmsg(User &user, std::vector<std::string> params);
 		void	cmd_notice(User &user, std::vector<std::string> params);
+		void	cmd_names(User &user, std::vector<std::string> params);
 		void	quit(User &user);
 		void	cmd_ping(User &user, const Message &msg);
 		void	cmd_pong(User &user, const Message &msg);
