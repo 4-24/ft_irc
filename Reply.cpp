@@ -1,6 +1,8 @@
 # include "Reply.hpp"
 # include "Server.hpp"
 
+
+
 void	Server::send_msg(User user, int code, std::string message)
 {
 	send(user.get_fd(), message.c_str(), message.size(), 0);
@@ -8,15 +10,11 @@ void	Server::send_msg(User user, int code, std::string message)
 
 void	Server::send_motd(User user)
 {
-	std::string serv_name = SERV;
-	std::string res1 = ":- " + serv_name + " Message of the day -";
-	send_msg(user, RPL_MOTDSTART, res1);
-
-	std::string res2 = "Welcome to the Internet Relay Network:= " + user.prefix();
-	send_msg(user, RPL_MOTD, res2);
-	send_msg(user, RPL_ENDOFMOTD, ":End of /MOTD command");
+	sendMessage(RPL_MOTDSTART(user.get_nickname()), user.get_fd());
+	sendMessage(RPL_MOTD(user.get_nickname(), (std::string)"*** 42Seoul 4-24 network ***"), user.get_fd());
+	sendMessage(RPL_ENDOFMOTD(user.get_nickname()), user.get_fd());
 }
-s
+
 void	Server::send_err(User user, int code, std::string message)
 {
 	send(user.get_fd(), message.c_str(), message.size(), 0);
