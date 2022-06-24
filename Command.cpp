@@ -224,7 +224,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 // 	}
 // }
 
-void	Server::cmd_part(User &user, std::vector<std::string> params)
+void	Server::cmd_part(User &user, std::vector<std::string> params) // o.k
 {
 	if (params.size() < 1)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));
@@ -244,7 +244,7 @@ void	Server::cmd_part(User &user, std::vector<std::string> params)
 	}
 }
 
-void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
+void	Server::cmd_privmsg(User &user, std::vector<std::string> params) // o.k
 {
 	if (!params.size() || params[0][0] == ':')
 		send_err(user, ERR_NORECIPIENT(user.get_nickname(), params[0]));
@@ -267,7 +267,7 @@ void	Server::cmd_privmsg(User &user, std::vector<std::string> params)
 	}
 }
 
-void	Server::cmd_notice(User &user, std::vector<std::string> params)
+void	Server::cmd_notice(User &user, std::vector<std::string> params) // o.k
 {
 	if (!params.size() || params[0][0] == ':')
 		send_err(user, ERR_NORECIPIENT(user.get_nickname(), params[0]));
