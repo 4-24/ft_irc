@@ -70,12 +70,16 @@ bool check_nick(std::string const &str) {
 		std::string::npos) && (str.size() > 0 && str.size() < 9);
 }
 
-void	Server::cmd_nick(User &user, std::string param)
+void	Server::cmd_nick(User &user, std::string param) // o.k
 {
+	if (!param || param == "")
+		send_err(user, ERR_NONICKNAMEGIVEN);
 	if (!check_nick(param)) // 잘못된 닉네임
-		send_err(user, ERR_ERRONEUSNICKNAME(user.get_nickname()));
+		send_err(user, ERR_ERRONEUSNICKNAME(param));
 	else if (find_nickname(param) != -1) // 이미 존재하는 닉네임
-		send_err(user, ERR_NICKNAMEINUSE, "nickname already exists");
+		send_err(user, ERR_NICKNAMEINUSE(param));
+	else if (find_nickname(param) != -1 && _users[find_nickname].is_registered())
+		send_err(user, ERR_NICKCOLLISION(param));
 	else // 정상적인 닉네임
 	{
 		user.set_nickname(param);
