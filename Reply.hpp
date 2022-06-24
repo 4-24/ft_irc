@@ -1,129 +1,56 @@
-#pragma once
+#ifndef REPLY_HPP
+# define REPLY_HPP
 
 #include <sstream>
 # include "Server.hpp"
 
-// Error replies
-#define ERR_NOSUCHNICK			401
-#define ERR_NOSUCHSERVER		402
-#define ERR_NOSUCHCHANNEL		403
-#define ERR_CANNOTSENDTOCHAN	404
-#define ERR_TOOMANYCHANNELS		405
-#define ERR_WASNOSUCHNICK		406
-#define ERR_TOOMANYTARGETS		407
-#define ERR_NOORIGIN			409
-#define ERR_NORECIPIENT			411
-#define ERR_NOTEXTTOSEND		412
-#define ERR_NOTOPLEVEL			413
-#define ERR_WILDTOPLEVEL		414
-#define ERR_UNKNOWNCOMMAND		421
-#define ERR_NOMOTD				422
-#define ERR_NOADMININFO			423
-#define ERR_FILEERROR			424
-#define ERR_NONICKNAMEGIVEN		431
-#define ERR_ERRONEUSNICKNAME	432
-#define ERR_NICKNAMEINUSE		433
-#define ERR_NICKCOLLISION		436
-#define ERR_USERNOTINCHANNEL	441
-#define ERR_NOTONCHANNEL		442
-#define ERR_USERONCHANNEL		443
-#define ERR_NOLOGIN				444
-#define ERR_SUMMONDISABLED		445
-#define ERR_USERSDISABLED		446
-#define ERR_NOTREGISTERED		451
-#define ERR_NEEDMOREPARAMS		461
-#define ERR_ALREADYREGISTRED	462
-#define ERR_NOPERMFORHOST		463
-#define ERR_PASSWDMISMATCH		464
-#define ERR_YOUREBANNEDCREEP	465
-#define ERR_KEYSET				467
-#define ERR_CHANNELISFULL		471
-#define ERR_UNKNOWNMODE			472
-#define ERR_INVITEONLYCHAN		473
-#define ERR_BANNEDFROMCHAN		474
-#define ERR_BADCHANNELKEY		475
-#define ERR_NOPRIVILEGES		481
-#define ERR_CHANOPRIVSNEEDED	482
-#define ERR_CANTKILLSERVER		483
-#define ERR_NOOPERHOST			491
-#define ERR_UMODEUNKNOWNFLAG	501
-#define ERR_USERSDONTMATCH		502
-#define	ERR_WRONGUSERNAME		503
-#define	ERR_FLOOD				504
+/*
+ *  Error Replies
+ */
 
-// Command responses
-#define RPL_NONE				300
-#define RPL_AWAY				301
-#define RPL_USERHOST			302
-#define RPL_ISON				303
-#define RPL_UNAWAY				305
-#define RPL_NOWAWAY				306
-#define RPL_WHOISUSER			311
-#define RPL_WHOISSERVER			312
-#define RPL_WHOISOPERATOR		313
-#define RPL_WHOISIDLE			317
-#define RPL_ENDOFWHOIS			318
-#define RPL_WHOISCHANNELS		319
-#define RPL_WHOWASUSER			314
-#define RPL_ENDOFWHOWAS			369
-#define RPL_LISTSTART			321
-#define RPL_LIST				322
-#define RPL_LISTEND				323
-#define RPL_CHANNELMODEIS		324
-#define RPL_NOTOPIC				331
-#define RPL_TOPIC				332
-#define RPL_INVITING			341
-#define RPL_SUMMONING			342
-#define RPL_VERSION				351
-#define RPL_WHOREPLY			352
-#define RPL_ENDOFWHO			315
-#define RPL_NAMREPLY			353
-#define RPL_ENDOFNAMES			366
-#define RPL_LINKS				364
-#define RPL_ENDOFLINKS			365
-#define RPL_BANLIST				367
-#define RPL_ENDOFBANLIST		368
-#define RPL_INFO				371
-#define RPL_ENDOFINFO			374
-#define RPL_MOTDSTART			375
-#define RPL_MOTD				372
-#define RPL_ENDOFMOTD			376
-#define RPL_YOUREOPER			381
-#define RPL_REHASHING			382
-#define RPL_TIME				391
-#define RPL_USERSSTART			392
-#define RPL_USERS				393
-#define RPL_ENDOFUSERS			394
-#define RPL_NOUSERS				395
-#define RPL_TRACELINK			200
-#define RPL_TRACECONNECTING		201
-#define RPL_TRACEHANDSHAKE		202
-#define RPL_TRACEUNKNOWN		203
-#define RPL_TRACEOPERATOR		204
-#define RPL_TRACEUSER			205
-#define RPL_TRACESERVER			206
-#define RPL_TRACENEWTYPE		208
-#define RPL_TRACELOG			261
-#define RPL_STATSLINKINFO		211
-#define RPL_STATSCOMMANDS		212
-#define RPL_STATSCLINE			213
-#define RPL_STATSNLINE			214
-#define RPL_STATSILINE			215
-#define RPL_STATSKLINE			216
-#define RPL_STATSYLINE			218
-#define RPL_ENDOFSTATS			219
-#define RPL_UMODEIS				221
-#define RPL_STATSLLINE			241
-#define RPL_STATSUPTIME			242
-#define RPL_STATSOLINE			243
-#define RPL_STATSHLINE			244
-#define RPL_LUSERCLIENT			251
-#define RPL_LUSEROP				252
-#define RPL_LUSERUNKNOWN		253
-#define RPL_LUSERCHANNELS		254
-#define RPL_LUSERME				255
-#define RPL_ADMINME				256
-#define RPL_ADMINLOC1			257
-#define RPL_ADMINLOC2			258
-#define RPL_ADMINEMAIL			259
-#define RPL_KILLUSER			260
+# define ERR_NOSUCHNICK(nick)						":ircserv 401 " + nick + " :No such nick/channel\n"
+# define ERR_NOSUCHCHANNEL(nick, channel)			":ircserv 403 " + nick + " " + channel + " :No such channel\n"
+# define ERR_CANNOTSENDTOCHAN(nick, channel)		":ircserv 404 " + nick + " " + channel + " :Cannot send to channel\n"
+# define ERR_TOOMANYCHANNELS(nick, channel)			":ircserv 405 " + nick + " " + channel + " :You have joined too many channels\n"
+# define ERR_NORECIPIENT(nick, command)				":ircserv 411 " + nick + " :No recipient given " + command + "\n"
+# define ERR_NOTEXTTOSEND(nick)						":ircserv 412 " + nick + " :No text to send\n"
+# define ERR_NONICKNAMEGIVEN						":ircserv 431 :No nickname given\n"
+# define ERR_ERRONEUSNICKNAME(nick)					":ircserv 432 " + nick + " :Erroneus nickname\n"
+# define ERR_NICKNAMEINUSE(nick)					":ircserv 433 " + nick + " :Nickname is already in use\n"
+# define ERR_NICKCOLLISION(nick)					":ircserv 436 " + nick + " :Nickname collision KILL\n"
+# define ERR_NOTONCHANNEL(nick, channel)			":ircserv 442 " + nick + " " + channel + " :You're not on that channel\n"
+# define ERR_NOTREGISTERED							":ircserv 451 * :You have not registered\n"
+# define ERR_NEEDMOREPARAMS(nick, command)			":ircserv 461 " + nick + " " + command + " :Not enough parameters\n"
+# define ERR_ALREADYREGISTRED(nick)					":ircserv 462 " + nick + " :You may not reregister\n"
+# define ERR_PASSWDMISMATCH(nick)					":ircserv 464 " + nick + " :Password incorrect\n"
+# define ERR_CHANNELISFULL(nick, channel)			":ircserv 471 " + nick + " " + channel + " :Cannot join channel (+l)\n"
+# define ERR_UNKNOWNMODE(nick, flags)				":ircserv 472 " + nick + " " +  flags + " :is unknown mode char to me\n"
+# define ERR_BADCHANNELKEY(nick, channel)			":ircserv 475 " + nick + " " + channel + " :Cannot join channel (+k)\n"
+# define ERR_NOPRIVILEGES(nick)						":ircserv 481 " + nick + " :Permission Denied- You're not an IRC operator\n"
+# define ERR_CHANOPRIVSNEEDED(nick, channel)		":ircserv 482 " + nick + " " + channel + " :You're not channel operator\n"
+# define ERR_NOOPERHOST(nick)						":ircserv 491 " + nick + " :No O-lines for your host\n"
+# define ERR_UMODEUNKNOWNFLAG(nick, channel)		":ircserv 501 " + nick + " " + channel + " :Unknown MODE flag\n"
+# define ERR_USERSDONTMATCH(nick)					":ircserv 502 " + nick + " :Cant change mode for other users\n"
+
+/*
+ *  Command responses
+ */
+
+# define RPL_WELCOME(nick)							":ircserv 001 " + nick + " :Welcome to the Internet Relay Network " + nick + "\n"
+# define RPL_UMODEIS(nick, mode)					":ircserv 221 " + nick + " " + mode + "\n"
+# define RPL_AWAY(nick, message)					":ircserv 301 * " + nick + " :" + message + "\n"
+# define RPL_UNAWAY(nick)							":ircserv 305 * " + nick + " :You are no longer marked as being away\n"
+# define RPL_NOWAWAY(nick)							":ircserv 306 * " + nick + " :You have been marked as being away\n"
+# define RPL_LISTSTART(nick)						":ircserv 321 " + nick + " Channel :Users Name\n"
+# define RPL_LIST(nick, channel, numusers, topic)	":ircserv 322 " + nick + " " + channel + " " + numusers + " : " + topic + "\n"
+# define RPL_LISTEND(nick)							":ircserv 323 " + nick + " :End of /LIST\n"
+# define RPL_NOTOPIC(nick, channel)					":ircserv 331 " + nick + " " + channel + " :No topic is set\n"
+# define RPL_TOPIC(nick, channel, topic)			":ircserv 332 "  + nick + " " + channel + " :" + topic + "\n"
+# define RPL_NAMREPLY(nick, channel, users)			":ircserv 353 " + nick + " = " + channel + " :" + users + "\n"
+# define RPL_ENDOFNAMES(nick, channel)				":ircserv 366 " + nick + " " + channel + " :End of /NAMES list\n"
+# define RPL_MOTD(nick, comment) 					":ircserv 372 " + nick + " :- " + comment + "\n"
+# define RPL_MOTDSTART(nick)						":ircserv 375 " + nick + " :- IRC Message of the day - \n"
+# define RPL_ENDOFMOTD(nick)						":ircserv 376 " + nick + " :End of MOTD command\n"
+# define RPL_YOUREOPER(nick)						":ircserv 381 " + nick + " :You are now an IRC operator\n"
+
+#endif

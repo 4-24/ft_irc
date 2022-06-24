@@ -1,19 +1,9 @@
 # include "Reply.hpp"
 # include "Server.hpp"
 
-std::string Server::header(int code, User &user)
-{
-	std::string msg = ":ircserv ";
-	std::stringstream ss;
-	ss << code;
-	msg += ss.str() + " " + user.get_nickname() + " ";
-	return msg;
-}
-
 void	Server::send_msg(User user, int code, std::string message)
 {
-	std::string res = header(code, user) + message + "\n";
-	send(user.get_fd(), res.c_str(), res.size(), 0);
+	send(user.get_fd(), message.c_str(), message.size(), 0);
 }
 
 void	Server::send_motd(User user)
@@ -26,11 +16,10 @@ void	Server::send_motd(User user)
 	send_msg(user, RPL_MOTD, res2);
 	send_msg(user, RPL_ENDOFMOTD, ":End of /MOTD command");
 }
-
+s
 void	Server::send_err(User user, int code, std::string message)
 {
-	std::string res = header(code, user) + message + "\n";
-	send(user.get_fd(), res.c_str(), res.size(), 0);
+	send(user.get_fd(), message.c_str(), message.size(), 0);
 	throw std::runtime_error((message + "\n").c_str());
 }
 

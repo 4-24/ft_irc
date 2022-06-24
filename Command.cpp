@@ -92,7 +92,7 @@ void	Server::cmd_user(User &user, std::vector<std::string> params)
 	if (user.is_registered()) // 이미 등록된 유저
 		send_err(user, ERR_ALREADYREGISTRED, "You may not reregister");
 	if (params.size() != 4)
-		send_err(user, ERR_NEEDMOREPARAMS, "Not enough parameters");
+		send_err(user, ERR_NEEDMOREPARAMS, "USER :Not enough parameter");
 	else // 정상적인 유저
 	{
 		if (find_username(params[0]) == -1)
@@ -117,7 +117,7 @@ void	Server::cmd_oper(User &user, std::vector<std::string> params)
 	int user_idx = find_user_idx(user.get_fd());
 
 	if (params.size() != 2)
-		send_err(user, ERR_NEEDMOREPARAMS, "usage : ./oper [nick] [password]");
+		send_err(user, ERR_NEEDMOREPARAMS, "OPER :usage : ./oper [nick] [password]");
 	if (params[0] != SUPER_NICK)
 		send_err(user, ERR_WRONGUSERNAME, "wrong host nick name");
 	if (params[1] != SUPER_PASS)
@@ -134,7 +134,7 @@ void	Server::cmd_mode(User &user, std::vector<std::string> params)
 	if (!_users[user_idx].is_admin())
 		send_err(user, ERR_NOPRIVILEGES, "you're not operator");
 	if (params[0].empty() || params[1].empty())
-		send_err(user, ERR_NEEDMOREPARAMS, "usage : ./mode [option] [nick]");
+		send_err(user, ERR_NEEDMOREPARAMS, "MODE :usage : ./mode [option] [nick]");
 	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
 	{
 		if (find_nickname(params[1]) == -1)
@@ -145,7 +145,7 @@ void	Server::cmd_mode(User &user, std::vector<std::string> params)
 			_users[find_nickname(params[1])].set_admin(false);
 	}
 	else
-		send_err(user, ERR_NEEDMOREPARAMS, "usage : ./mode [option] [nick]");
+		send_err(user, ERR_NEEDMOREPARAMS, "MODE :usage : ./mode [option] [nick]");
 }
 
 void	Server::cmd_join(User &user, std::string param)
@@ -207,30 +207,22 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params)
 
 void	Server::cmd_part(User &user, std::vector<std::string> params)
 {
-	if (params.size() == 0)
-	{
-		if (user.get_room_idx() != -1)
-		{
-			_rooms[user.get_room_idx()].remove_user(user);
-			user.set_room_idx(-1);
-		}
-		else
-			send_err(user, ERR_NOTONCHANNEL, "You're not on that channel");
-	}
+	int	room_idx = user.get_room_idx();
+
+	if (params.size() < 1)
+		send_err(user, ERR_NEEDMOREPARAMS, "PART :Not enough parameter");
 	else
 	{
-		if (params[0][0] == '#')
+		if (find_room_idx(params[0]))
+			send_err(user, ERR_NOSUCHCHANNEL, params[0] + " :No such channel");
+		else if (room_idx != -1)
 		{
-			if (user.get_room_idx() != -1)
-			{
-				_rooms[user.get_room_idx()].remove_user(user);
-				user.set_room_idx(-1);
-			}
-			else
-				send_err(user, ERR_NOTONCHANNEL, "You're not on that channel");
+			_rooms[room_idx].remove_user(user.get_nickname());
+			user.set_room_idx(-1);
+			_rooms[room_idx].send_all(":" + user.get_nickname() + " PART " + _rooms[room_idx].get_name() + "\n");
 		}
 		else
-			send_err(user, ERR_NOSUCHCHANNEL, "No such channel");
+			send_err(user, ERR_NOTONCHANNEL, params[0] + " :You're not on that channel");
 	}
 }
 
@@ -275,7 +267,7 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 	std::string msg = " :";
 
 	if (params.size() > 1)
-		send_err(user, ERR_NEEDMOREPARAMS, "too many params");
+		send_err(user, ERR_NEEDMOREPARAMS, "NAMES :Not enough parameter");
 	else if (params.size() == 0)
 	{
 		for (size_t i = 0; i < _rooms.size(); i++)
