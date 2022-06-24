@@ -91,12 +91,12 @@ void	Server::cmd_nick(User &user, std::string param) // o.k
 	}
 }
 
-void	Server::cmd_user(User &user, std::vector<std::string> params)
+void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
 {
-	if (user.is_registered()) // 이미 등록된 유저
-		send_err(user, ERR_ALREADYREGISTRED, "You may not reregister");
 	if (params.size() != 4)
-		send_err(user, ERR_NEEDMOREPARAMS, "USER :Not enough parameter");
+		send_err(user, ERR_NEEDMOREPARAMS(user.nickname(), "USER"));
+	if (user.is_registered()) // 이미 등록된 유저
+		send_err(user, ERR_ALREADYREGISTRED(user.nickname()));
 	else // 정상적인 유저
 	{
 		if (find_username(params[0]) == -1)
@@ -106,7 +106,7 @@ void	Server::cmd_user(User &user, std::vector<std::string> params)
 		}
 		else
 		{
-			send_err(user, ERR_ALREADYREGISTRED, "You may not reregister");
+			send_err(user, ERR_ALREADYREGISTRED(user.nickname()));
 		}
 		if (user.get_nickname().size() > 0 && user.get_username().size() > 0)
 		{
