@@ -152,7 +152,7 @@ void	Server::cmd_mode(User &user, std::vector<std::string> params)
 		send_err(user, ERR_NEEDMOREPARAMS, "MODE :usage : ./mode [option] [nick]");
 }
 
-void	Server::cmd_join(User &user, std::string param)
+void	Server::cmd_join(User &user, std::string param) // o.k. but some part
 {
 	if (param.size() > 0)
 	{
@@ -170,7 +170,7 @@ void	Server::cmd_join(User &user, std::string param)
 					room.add_user(user);
 					_rooms.push_back(room);
 					room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
-					send_msg(user, RPL_NOTOPIC, param + " :No topic is set");
+					send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
 				}
 				else // 방이 있을 때
 				{
@@ -179,13 +179,13 @@ void	Server::cmd_join(User &user, std::string param)
 					user.set_room_idx(i);
 					_rooms[i].add_user(user);
 					_rooms[i].send_all(":" + user.get_nickname() + " JOIN " + _rooms[i].get_name() + "\n");
-					send_msg(user, RPL_NOTOPIC, param + " :No topic is set");
+					send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
 				}
 				_rooms[find_room_idx(param)].get_user_list();
 			}
 		}
 		else
-			send_err(user, ERR_NOSUCHCHANNEL, param + " :No such channel");
+			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), param));
 	}
 }
 
