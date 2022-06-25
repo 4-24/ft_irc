@@ -42,6 +42,8 @@ void	Server::execute(User &user, Message message)
 			cmd_names(user, params);
 		else if (command == "LIST")
 			cmd_list(user, params);
+		else if (command == "TOPIC")
+			cmd_topic(user, params);
 		else
 			send_err(user, ERR_UNKNOWNCOMMAND);
 	}
@@ -356,6 +358,34 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 		int i = find_room_idx(params[0]);
 			send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_user_list()));
 			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[i].get_name()));
+	}
+}
+
+void	Server::cmd_topic(User &user, std::vector<std::string> params)
+{
+	int server_room = -1;
+	int user_room = -1;
+
+	if  (params.empty() || (params.size() != 1 && params.size() != 2))
+		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "TOPIC"));
+	if ((server_room = find_room_idx(params[0])))
+		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
+	if (params.size() == 1)
+	{
+		if (_rooms[server_room].get_topic().empty())
+			send_msg(user, RPL_NOTOPIC(user.get_nickname(), params[0]));
+		else
+			send_msg(user, RPL_TOPIC(user.get_nickname(), params[0], _rooms[server_room].get_topic()));
+	}
+	else
+	{
+		if ((user_room = user.get_room(params[0])) == -1)
+			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
+		if ((_rooms[server_room].is_admin(user.get_nickname())) == false)
+			send_err(user, ERR_CHANOPRIVSNEEDED(user.get_nickname(), params[0]));
+		user.get_rooms()[user_room]->set_topic(params[1]);
+		user.get_rooms()[user_room]->send_all(RPL_SETTOPIC(params[0], params[1]));
+		user.get_rooms()[user_room]->send_all(RPL_TOPIC(user.get_nickname(), params[0], _rooms[server_room].get_topic()));
 	}
 }
 
