@@ -26,7 +26,7 @@ void	Server::execute(User &user, Message message)
 			cmd_oper(user, params);
 		else if (command == "MODE")
 			cmd_mode(user, params);
-		else if (is_flooding(user)) // 플러딩 체크
+		else if (is_flooding(user))
 			return ;
 		else if (command == "JOIN")
 			cmd_join(user, params);
@@ -74,7 +74,7 @@ bool check_nick(std::string const &str) {
 		std::string::npos) && (str.size() > 0 && str.size() < 9);
 }
 
-void	Server::cmd_nick(User &user, std::string param) // o.k
+void	Server::cmd_nick(User &user, std::string param)
 {
 	if (param == "")
 		send_err(user, ERR_NONICKNAMEGIVEN);
@@ -95,7 +95,7 @@ void	Server::cmd_nick(User &user, std::string param) // o.k
 	}
 }
 
-void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
+void	Server::cmd_user(User &user, std::vector<std::string> params)
 {
 	if (params.size() != 4)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "USER"));
@@ -122,43 +122,42 @@ void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
 
 void	Server::cmd_oper(User &user, std::vector<std::string> params)
 {
-	(void)user, (void)params;
- 	//int user_idx = find_user_idx(user.get_fd());
+ 	int user_idx = find_user_idx(user.get_fd());
 
- 	//if (params.size() != 2)
- 	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "OPER"));
- 	//if (params[0] != SUPER_NICK)
- 	//	send_err(user, ERR_WRONGUSERNAME, "wrong host nick name");
- 	//if (params[1] != SUPER_PASS)
- 	//	send_err(user, ERR_PASSWDMISMATCH, "wrong host password");
- 	//_users[user_idx].set_admin(true);
- 	//send_msg(user, RPL_YOUREOPER, "Operator privileges have been obtained");
- 	//std::cout << "\nUSER[" << user_idx << "] Operator privileges have been obtained\n" << std::endl;
+ 	if (params.size() != 2)
+ 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "OPER"));
+ 	if (params[0] != SUPER_NICK)
+ 		send_err(user, ERR_ERRONEUSNICKNAME(user.get_nickname()));
+ 	if (params[1] != SUPER_PASS)
+ 		send_err(user, ERR_PASSWDMISMATCH(user.get_nickname()));
+ 	_users[user_idx].set_admin(true);
+ 	send_msg(user, RPL_YOUREOPER(user.get_nickname()));
 }
 
 void	Server::cmd_mode(User &user, std::vector<std::string> params)
 {
-	(void)user, (void)params;
- 	//int user_idx = find_user_idx(user.get_fd());
+ 	int user_idx = find_user_idx(user.get_fd());
 
- 	//if (!_users[user_idx].is_admin())
- 	//	send_err(user, ERR_NOPRIVILEGES, "you're not operator");
- 	//if (params[0].empty() || params[1].empty())
- 	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
- 	//if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
- 	//{
- 	//	if (find_nickname(params[1]) == -1)
- 	//		send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
- 	//	if (params[0][0] == '+')
- 	//		_users[find_nickname(params[1])].set_admin(true);
- 	//	else
- 	//		_users[find_nickname(params[1])].set_admin(false);
- 	//}
- 	//else
- 	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
+	if (params.size() >= 1 && params[0][0] == '#')
+		return ;
+ 	if (!_users[user_idx].is_admin())
+ 		send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
+ 	if (params[0].empty() || params[1].empty())
+ 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
+ 	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
+ 	{
+ 		if (find_nickname(params[1]) == -1)
+ 			send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
+ 		if (params[0][0] == '+')
+ 			_users[find_nickname(params[1])].set_admin(true);
+ 		else
+ 			_users[find_nickname(params[1])].set_admin(false);
+ 	}
+ 	else
+ 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
 }
 
-void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
+void	Server::cmd_join(User &user, std::vector<std::string> params)
 {
 	if (params.size() < 1)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "JOIN"));
@@ -205,33 +204,32 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 
 void	Server::cmd_list(User &user, std::vector<std::string> params)
 {
-	(void)user, (void)params;
-	//send_msg(user, RPL_LISTSTART(user.get_nickname()));
-	//if (params.size() == 0)
-	//{
-	//	for(unsigned long i = 0; i < _rooms.size(); i++)
-	//	{
-	//		std::stringstream	tmp;
-	//		tmp << _params[0].get_users().size();
-	//		send_msg(user, RPL_LIST(user.get_nickname(), _params[0].get_name(), tmp.str(), _params[0].get_topic()));
-	//	}
-	//}
-	//else if (params.size() == 1)
-	//{
-	//	std::vector<std::string>	rooms = split(params[0], ',');
-	//	for(unsigned long i = 0; i < rooms.size(); i++)
-	//	{
-	//		if (find_room_idx(params[0]) == -1)
-	//			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
-	//		else
-	//		{
-	//			std::stringstream	tmp;
-	//			tmp << _rooms[find_room_idx(params[0])].get_users().size();
-	//			send_msg(user, RPL_LIST(user.get_nickname(), _rooms[find_room_idx(params[0])].get_name(), tmp.str(), _rooms[find_room_idx(params[0])].get_topic()));
-	//		}
-	//	}
-	//}
-	//send_msg(user, RPL_LISTEND(user.get_nickname()));
+	send_msg(user, RPL_LISTSTART(user.get_nickname()));
+	if (params.size() == 0)
+	{
+		for(unsigned long i = 0; i < _rooms.size(); i++)
+		{
+			std::stringstream	tmp;
+			tmp << _rooms[i].get_users().size();
+			send_msg(user, RPL_LIST(user.get_nickname(), _rooms[i].get_name(), tmp.str(), _rooms[i].get_topic()));
+		}
+	}
+	else if (params.size() == 1)
+	{
+		std::vector<std::string>	rooms = split(params[0], ',');
+		for(unsigned long i = 0; i < rooms.size(); i++)
+		{
+			if (find_room_idx(rooms[i]) == -1)
+				send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
+			else
+			{
+				std::stringstream	tmp;
+				tmp << _rooms[find_room_idx(rooms[i])].get_users().size();
+				send_msg(user, RPL_LIST(user.get_nickname(), _rooms[find_room_idx(rooms[i])].get_name(), tmp.str(), _rooms[find_room_idx(rooms[i])].get_topic()));
+			}
+		}
+	}
+	send_msg(user, RPL_LISTEND(user.get_nickname()));
 }
 
 void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
@@ -340,7 +338,7 @@ void	Server::cmd_topic(User &user, std::vector<std::string> params)
 
 	if  (params.empty() || (params.size() != 1 && params.size() != 2))
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "TOPIC"));
-	if ((server_room = find_room_idx(params[0])))
+	if ((server_room = find_room_idx(params[0])) == -1)
 		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 	if (params.size() == 1)
 	{
