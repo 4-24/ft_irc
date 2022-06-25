@@ -267,7 +267,8 @@ void	Server::cmd_part(User &user, std::string param) // o.k
 	user.delete_room(param);
 	room.send_all(":" + user.get_nickname() + " PART " + room.get_name() + "\n");
 	room.remove_user(user.get_nickname());
-
+	if (room.get_users().size() == 0)
+		_rooms.erase(_rooms.begin() + find_room_idx(param));
 }
 
 void	Server::cmd_privmsg(User &user, std::vector<std::string> params) // o.k
