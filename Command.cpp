@@ -230,39 +230,29 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 	}
 	send_msg(user, RPL_LISTEND(user.get_nickname()));
 }
-
-void	Server::cmd_kick(User &user, std::string param) // o.k
+// param[0]: room name,  param[1]: user name
+void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 {
  	if (params.size() < 2)
  		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "KICK"));
 
-	std::vector<std::string> rooms = split(params[0],',');
-	std::vector<std::string> users = split(params[1],',');
-	for (unsigned long i = 0; i < rooms.size(); i++)
+	room_idx = find_room_idx(params[0]);
+	if (room_idx == -1)
+		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
+	if (!_rooms[room_idx].is_admin(user.get_nickname()))
+		send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
+
+	for (unsigned long i = 0; i < users.size(); i++)
 	{
-		int	room_idx = find_room_idx(param);
-		if (room_idx == -1)
-			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), param));
-		if (!_rooms[room_idx].is_admin(user.get_nickname()))
-			send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
+		if (!_rooms[room_idx].is_admin(user->get_nickname()))
+			send_err(*user, ERR_NOTONCHANNEL(user->get_nickname(), _rooms[room_idx].get_name()));
 
-		for (unsigned long j = 0; j < users.size(); j++)
-		{
-			User *user = &_users[find_nickname(users[j])];
-			if (!user)
-				send_err(*user, ERR_NOSUCHNICK(user->get_nickname()));
-			if (!_rooms[room_idx].is_admin(user->get_nickname()))
-				send_err(*user, ERR_NOTONCHANNEL(user->get_nickname(), _rooms[room_idx].get_name()));
+		if (_rooms[room_idx]->is_user(params[1]) == false)
+			send_err(*user, ERR_NOSUCHNICK(user->get_nickname()));
 
-			std::string reply;
-			if (params.size() == 3)
-				reply = param + " " + user->get_nickname() + " :" + params[2];
-			else
-				reply = param + " " + user->get_nickname();
-			_rooms[room_idx].remove_user(*user);
-			_rooms[room_idx].send_all(":" + user->get_nickname() + " KICK " + reply + "\n");
-			user->delete_room(param);
-		}
+		_rooms[room_idx].remove_user(params[1]);
+		_rooms[room_idx].send_all(":" + user->get_nickname() + " KICK " + params[0] + " " + params[1] + "\n");
+		user->delete_room(params[0]);
  	}
 }
 
