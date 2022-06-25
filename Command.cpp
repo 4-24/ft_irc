@@ -204,25 +204,40 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 	}
 }
 
-// void	Server::cmd_kick(User &user, std::vector<std::string> params)
-// {
-// 	int	room_idx = find_room_idx(params[0]);
+void	Server::cmd_kick(User &user, std::vector<std::string> params)
+{
+ 	if (params.size() < 2)
+ 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "KICK"));
 
-// 	if (params.size() < 2)
-// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "KICK"));
-// 	else if (room_idx == -1)
-// 		send_err(user, 403, params[0] + " :No such channel");
-// 	else if (!user.is_admin())
-// 		send_err(user, 482, params[0] + " :You're not channel operator");
-// 	else if (room_idx != user.get_room_idx())
-// 		send_err(user, 482, params[0] + " :You're not on that channel");
-// 	else if (_rooms[room_idx].is_user(params[1]) == false)
-// 		send_err(user, 441, params[1] + " :No such nickname");
-// 	else {
-// 		_rooms[room_idx].remove_user(params[1]);
-// 		send_msg(user, RPL_NONE("KICK :" + params[1]));
-// 	}
-// }
+	std::vector<std::string> rooms = split(params[0],',');
+	std::vector<std::string> users = split(params[1],',');
+	for (unsigned long i = 0; i < rooms.size(); i++)
+	{
+		int	room_idx = find_room_idx(rooms[i]);
+		if (room_idx == -1)
+			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
+		if (!_rooms[room_idx].is_admin(user.get_nickname()))
+			send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
+
+		for (unsigned long j = 0; j < users.size(); j++)
+		{
+			User *user = &_users[find_nickname(users[j])];
+			if (!user)
+				send_err(*user, ERR_NOSUCHNICK(user->get_nickname()));
+			if (!_rooms[room_idx].is_admin(user->get_nickname()))
+				send_err(*user, ERR_NOTONCHANNEL(user->get_nickname(), _rooms[room_idx].get_name()));
+
+			std::string reply;
+			if (params.size() == 3)
+				reply = rooms[i] + " " + user->get_nickname() + " :" + params[2];
+			else
+				reply = rooms[i] + " " + user->get_nickname();
+			_rooms[room_idx].send_all(":" + user->get_nickname() + " KICK " + reply + "\n");
+			_rooms[room_idx].remove_user(params[1]);
+			user->delete_room(rooms[i]);
+		}
+ 	}
+}
 
 void	Server::cmd_part(User &user, std::vector<std::string> params) // o.k
 {

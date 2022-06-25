@@ -95,3 +95,11 @@ bool Room::is_user(std::string name) const
 	}
 	return false;
 }
+
+bool	Room::is_admin(std::string name) const
+{
+	if (_users.size() > 0)
+		if (_users[0]->get_nickname() == name)
+			return true;
+	return false;
+}

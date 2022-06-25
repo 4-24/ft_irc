@@ -32,6 +32,7 @@ class	Room
 		std::vector<User *>	get_users() const;
 		std::string			get_user_list();
 		bool				is_user(std::string name) const;
+		bool				is_admin(std::string name) const;
 };
 
 #endif
