@@ -161,7 +161,6 @@ void	Server::cmd_join(User &user, std::vector<std::string> params)
 {
 	if (params.size() < 1)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "JOIN"));
-
 	if (is_valid_room_name(params[0]) == false)
 		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 	int i = find_room_idx(params[0]);
@@ -169,7 +168,6 @@ void	Server::cmd_join(User &user, std::vector<std::string> params)
 	{
 		if (user.get_rooms().size() >= MAX_ROOM_USER)
 			send_err(user, ERR_TOOMANYCHANNELS(user.get_nickname(), params[0]));
-
 		Room room(params[0]);
 		if (params[1].empty() == false)
 			room.set_key(params[1]);
@@ -216,17 +214,16 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 	}
 	else if (params.size() == 1)
 	{
-		std::vector<std::string>	rooms = split(params[0], ',');
-		for(unsigned long i = 0; i < rooms.size(); i++)
+		int room_idx = find_room_idx(params[0]);
+
+		if (room_idx == -1)
+			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
+		else
 		{
-			if (find_room_idx(rooms[i]) == -1)
-				send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
-			else
-			{
-				std::stringstream	tmp;
-				tmp << _rooms[find_room_idx(rooms[i])].get_users().size();
-				send_msg(user, RPL_LIST(user.get_nickname(), _rooms[find_room_idx(rooms[i])].get_name(), tmp.str(), _rooms[find_room_idx(rooms[i])].get_topic()));
-			}
+			std::stringstream	count;
+
+			count << _rooms[room_idx].get_users().size();
+			send_msg(user, RPL_LIST(user.get_nickname(), _rooms[room_idx].get_name(), count.str(), _rooms[room_idx].get_topic()));
 		}
 	}
 	send_msg(user, RPL_LISTEND(user.get_nickname()));
@@ -333,29 +330,28 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 
 void	Server::cmd_topic(User &user, std::vector<std::string> params)
 {
-	int server_room = -1;
-	int user_room = -1;
+	int room_idx;
 
 	if  (params.empty() || (params.size() != 1 && params.size() != 2))
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "TOPIC"));
-	if ((server_room = find_room_idx(params[0])) == -1)
+	if ((room_idx = find_room_idx(params[0])) == -1)
 		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 	if (params.size() == 1)
 	{
-		if (_rooms[server_room].get_topic().empty())
+		if (_rooms[room_idx].get_topic().empty())
 			send_msg(user, RPL_NOTOPIC(user.get_nickname(), params[0]));
 		else
-			send_msg(user, RPL_TOPIC(user.get_nickname(), params[0], _rooms[server_room].get_topic()));
+			send_msg(user, RPL_TOPIC(user.get_nickname(), params[0], _rooms[room_idx].get_topic()));
 	}
 	else
 	{
-		if ((user_room = user.get_room(params[0])) == -1)
+		if (!_rooms[room_idx].is_user(user.get_nickname))
 			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
-		if ((_rooms[server_room].is_admin(user.get_nickname())) == false)
+		if ((_rooms[room_idx].is_admin(user.get_nickname())) == false)
 			send_err(user, ERR_CHANOPRIVSNEEDED(user.get_nickname(), params[0]));
-		user.get_rooms()[user_room]->set_topic(params[1]);
-		user.get_rooms()[user_room]->send_all(RPL_SETTOPIC(params[0], params[1]));
-		user.get_rooms()[user_room]->send_all(RPL_TOPIC(user.get_nickname(), params[0], _rooms[server_room].get_topic()));
+		_rooms[room_idx]->set_topic(params[1]);
+		_rooms[room_idx]->send_all(RPL_SETTOPIC(params[0], params[1]));
+		_rooms[room_idx]->send_all(RPL_TOPIC(user.get_nickname(), params[0], _rooms[server_room].get_topic()));
 	}
 }
 
