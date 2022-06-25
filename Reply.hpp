@@ -34,7 +34,7 @@
 # define ERR_NOOPERHOST(nick)						":ircserv 491 " + nick + " :No O-lines for your host\n"
 # define ERR_UMODEUNKNOWNFLAG(nick, channel)		":ircserv 501 " + nick + " " + channel + " :Unknown MODE flag\n"
 # define ERR_USERSDONTMATCH(nick)					":ircserv 502 " + nick + " :Cant change mode for other users\n"
-# define ERR_FLOOD(sec)								":ircserv 504 * :flood detected, please wait " + sec + " seconds"
+# define ERR_FLOOD(sec)								":ircserv 504 * :flood detected, please wait " + sec + " seconds\n"
 
 /*
  *  Command responses

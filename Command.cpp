@@ -20,7 +20,7 @@ void	Server::execute(User &user, Message message)
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
 			cmd_user(user, params);
-		else if (!user.is_authenticated() && !user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
+		else if (!user.is_authenticated() || (!user.is_registered() && command != "NICK" && command != "USER")) // 등록되지 않은 사용자
 			send_err(user, ERR_NOTREGISTERED);
 		else if (command == "OPER")
 			cmd_oper(user, params);
@@ -33,7 +33,7 @@ void	Server::execute(User &user, Message message)
 		else if (command == "KICK")
 			cmd_kick(user, params);
 		else if (command == "PART")
-			cmd_part(user, params);
+			cmd_part(user, params[0]);
 		else if (command == "PRIVMSG")
 			cmd_privmsg(user, params);
 		else if (command == "NOTICE")
@@ -158,89 +158,80 @@ void	Server::cmd_mode(User &user, std::vector<std::string> params)
  	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
 }
 
-// user.get_room(name) 조건 추가해야함
-void	Server::cmd_join(User &user, std::vector<std::string> params)
+void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 {
-	std::vector<std::string> rooms;
-	std::vector<std::string> keys;
-
 	if (params.size() < 1)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "JOIN"));
 
-	rooms = split(params[0], ',');
-	if (params.size() == 2)
-		keys = split(params[1], ',');
-
-	for (unsigned long i = 0; i < rooms.size(); i++)
+	if (is_valid_room_name(params[0]) == false)
+		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
+	int i = find_room_idx(params[0]);
+	if (i == -1) // 방이 없을 때
 	{
-		if (is_valid_room_name(rooms[i]) == false)
-			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
-		int j = find_room_idx(rooms[i]);
-		if (j == -1) // 방이 없을 때
-		{
-			if (rooms.size() >= MAX_ROOM_USER)
-				send_err(user, ERR_TOOMANYCHANNELS(user.get_nickname(), rooms[i]));
+		if (user.get_rooms().size() >= MAX_ROOM_USER)
+			send_err(user, ERR_TOOMANYCHANNELS(user.get_nickname(), params[0]));
 
-			Room room(rooms[i]);
-			if (keys.size() > i)
-				room.set_key(keys[i]);
-			room.add_user(user);
-			_rooms.push_back(room);
-			std::cout << "Room " << rooms[i] << " created" << std::endl;
-			user.add_room(&(_rooms.back()));
-			room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
-			send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
-			send_msg(user, RPL_NAMREPLY(user.get_nickname(), room.get_name(), room.get_user_list()));
-			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), room.get_name()));
+		Room room(params[0]);
+		if (params[1].empty() == false)
+			room.set_key(params[1]);
+		room.add_user(user);
+		_rooms.push_back(room);
+		std::cout << "Room " << params[0] << " created" << std::endl;
+		user.add_room(&(_rooms.back()));
+		room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
+		send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
+		send_msg(user, RPL_NAMREPLY(user.get_nickname(), room.get_name(), room.get_user_list()));
+		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), room.get_name()));
 		}
+	else
+	{
+		if (user.get_room(params[0]) != -1)
+			return ;
+		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != params[1])
+			send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[i].get_name()));
+		if (_rooms[i].get_users().size() > 10)
+			send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[i].get_name()));
+		user.add_room(&_rooms[i]);
+		_rooms[i].add_user(user);
+		_rooms[i].send_all(":" + user.get_nickname() + " JOIN " + _rooms[i].get_name() + "\n");
+		if (_rooms[i].get_topic() == "")
+			send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[i].get_name()));
 		else
-		{
-			if ((keys.size() <= i && _rooms[j].get_key() != "") || (keys.size() > i && _rooms[j].get_key() != keys[i]))
-				send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[j].get_name()));
-			if (_rooms[j].get_users().size() > 10)
-				send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[j].get_name()));
-			user.add_room(&_rooms[j]);
-			_rooms[j].add_user(user);
-			_rooms[j].send_all(":" + user.get_nickname() + " JOIN " + _rooms[j].get_name() + "\n");
-			if (_rooms[j].get_topic() == "")
-				send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[j].get_name()));
-			else
-				send_msg(user, RPL_TOPIC(user.get_nickname(), _rooms[j].get_name(), _rooms[j].get_topic()));
-			send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[j].get_name(), _rooms[j].get_user_list()));
-			send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[j].get_name()));
-			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[j].get_name()));
-		}
+			send_msg(user, RPL_TOPIC(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_topic()));
+		send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_user_list()));
+		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[i].get_name()));
 	}
 }
 
 void	Server::cmd_list(User &user, std::vector<std::string> params)
 {
-	send_msg(user, RPL_LISTSTART(user.get_nickname()));
-	if (params.size() == 0)
-	{
-		for(unsigned long i = 0; i < _rooms.size(); i++)
-		{
-			std::stringstream	tmp;
-			tmp << _rooms[i].get_users().size();
-			send_msg(user, RPL_LIST(user.get_nickname(), _rooms[i].get_name(), tmp.str(), _rooms[i].get_topic()));
-		}
-	}
-	else if (params.size() == 1)
-	{
-		std::vector<std::string>	rooms = split(params[0], ',');
-		for(unsigned long i = 0; i < rooms.size(); i++)
-		{
-			if (find_room_idx(rooms[i]) == -1)
-				send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
-			else
-			{
-				std::stringstream	tmp;
-				tmp << _rooms[find_room_idx(rooms[i])].get_users().size();
-				send_msg(user, RPL_LIST(user.get_nickname(), _rooms[find_room_idx(rooms[i])].get_name(), tmp.str(), _rooms[find_room_idx(rooms[i])].get_topic()));
-			}
-		}
-	}
-	send_msg(user, RPL_LISTEND(user.get_nickname()));
+	(void)user, (void)params;
+	//send_msg(user, RPL_LISTSTART(user.get_nickname()));
+	//if (params.size() == 0)
+	//{
+	//	for(unsigned long i = 0; i < _rooms.size(); i++)
+	//	{
+	//		std::stringstream	tmp;
+	//		tmp << _params[0].get_users().size();
+	//		send_msg(user, RPL_LIST(user.get_nickname(), _params[0].get_name(), tmp.str(), _params[0].get_topic()));
+	//	}
+	//}
+	//else if (params.size() == 1)
+	//{
+	//	std::vector<std::string>	rooms = split(params[0], ',');
+	//	for(unsigned long i = 0; i < rooms.size(); i++)
+	//	{
+	//		if (find_room_idx(params[0]) == -1)
+	//			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
+	//		else
+	//		{
+	//			std::stringstream	tmp;
+	//			tmp << _rooms[find_room_idx(params[0])].get_users().size();
+	//			send_msg(user, RPL_LIST(user.get_nickname(), _rooms[find_room_idx(params[0])].get_name(), tmp.str(), _rooms[find_room_idx(params[0])].get_topic()));
+	//		}
+	//	}
+	//}
+	//send_msg(user, RPL_LISTEND(user.get_nickname()));
 }
 
 void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
@@ -248,57 +239,38 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
  	if (params.size() < 2)
  		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "KICK"));
 
-	std::vector<std::string> rooms = split(params[0],',');
-	std::vector<std::string> users = split(params[1],',');
-	for (unsigned long i = 0; i < rooms.size(); i++)
-	{
-		int	room_idx = find_room_idx(rooms[i]);
-		if (room_idx == -1)
-			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
-		if (!_rooms[room_idx].is_admin(user.get_nickname()))
-			send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
+	int room_idx = find_room_idx(params[0]);
+	if (room_idx == -1)
+		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
+	if (!_rooms[room_idx].is_admin(user.get_nickname()))
+		send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
+	if (!_rooms[room_idx].is_admin(user.get_nickname()))
+		send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), _rooms[room_idx].get_name()));
+	if (_rooms[room_idx].is_user(params[1]) == false)
+		send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
 
-		for (unsigned long j = 0; j < users.size(); j++)
-		{
-			User *user = &_users[find_nickname(users[j])];
-			if (!user)
-				send_err(*user, ERR_NOSUCHNICK(user->get_nickname()));
-			if (!_rooms[room_idx].is_admin(user->get_nickname()))
-				send_err(*user, ERR_NOTONCHANNEL(user->get_nickname(), _rooms[room_idx].get_name()));
-
-			std::string reply;
-			if (params.size() == 3)
-				reply = rooms[i] + " " + user->get_nickname() + " :" + params[2];
-			else
-				reply = rooms[i] + " " + user->get_nickname();
-			_rooms[room_idx].remove_user(*user);
-			_rooms[room_idx].send_all(":" + user->get_nickname() + " KICK " + reply + "\n");
-			user->delete_room(rooms[i]);
-		}
- 	}
+	_rooms[room_idx].remove_user(params[1]);
+	_rooms[room_idx].send_all(":" + user.get_nickname() + " KICK " + params[0] + " " + params[1] + "\n");
+	user.delete_room(params[0]);
 }
 
-void	Server::cmd_part(User &user, std::vector<std::string> params) // o.k
+void	Server::cmd_part(User &user, std::string param) // o.k
 {
-	if (params.size() < 1)
+	if (param.empty())
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));
 
-	std::vector<std::string> rooms = split(params[0], ',');
+	Room &room = _rooms[find_room_idx(param)];
 
-	for (unsigned long i = 0; i < rooms.size(); i++)
-	{
-		Room &target_room = _rooms[find_room_idx(rooms[i])];
-		int	room_idx = user.get_room(rooms[i]);
+	if(find_room_idx(param) == -1)
+		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), param));
+	if(!room.is_user(user.get_nickname()))
+		send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), param));
 
-		if(find_room_idx(rooms[i]) == -1)
-			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
-		if(room_idx == -1)
-			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
-		user.get_rooms()[room_idx]->remove_user(user.get_nickname());
-		user.delete_room(rooms[i]);
-		std::cout << "User room count: " << user.get_rooms().size() << std::endl;
-		target_room.send_all(":" + user.get_nickname() + " PART " + target_room.get_name() + "\n");
-	}
+	user.delete_room(param);
+	room.send_all(":" + user.get_nickname() + " PART " + room.get_name() + "\n");
+	room.remove_user(user.get_nickname());
+	if (room.get_users().size() == 0)
+		_rooms.erase(_rooms.begin() + find_room_idx(param));
 }
 
 void	Server::cmd_privmsg(User &user, std::vector<std::string> params) // o.k
@@ -391,8 +363,8 @@ void	Server::cmd_topic(User &user, std::vector<std::string> params)
 
 void	Server::quit(User &user)
 {
-	if (user.get_rooms().empty())
-		cmd_part(user, std::vector<std::string>(0));
+	if (user.get_rooms().empty() == false)
+		user.get_rooms().clear();
 	send_msg(user, RPL_NONE((std::string)"Goodbye!"));
 	close(user.get_fd());
 	std::cout << "User " << user.get_fd() << " disconnected." << std::endl;
