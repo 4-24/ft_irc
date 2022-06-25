@@ -230,7 +230,7 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 	}
 	send_msg(user, RPL_LISTEND(user.get_nickname()));
 }
-// param[0]: room name,  param[1]: user name
+
 void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 {
  	if (params.size() < 2)
