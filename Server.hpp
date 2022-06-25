@@ -73,6 +73,8 @@ class Server
 		void	cmd_privmsg(User &user, std::vector<std::string> params);
 		void	cmd_notice(User &user, std::vector<std::string> params);
 		void	cmd_names(User &user, std::vector<std::string> params);
+		void	cmd_list(User &user, std::vector<std::string> params);
+
 		void	quit(User &user);
 		void	cmd_ping(User &user, const Message &msg);
 		void	cmd_pong(User &user, const Message &msg);
