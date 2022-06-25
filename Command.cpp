@@ -116,8 +116,8 @@ void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
 	}
 }
 
- void	Server::cmd_oper(User &user, std::vector<std::string> params)
- {
+void	Server::cmd_oper(User &user, std::vector<std::string> params)
+{
 	(void)user, (void)params;
  	//int user_idx = find_user_idx(user.get_fd());
 
@@ -130,10 +130,10 @@ void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
  	//_users[user_idx].set_admin(true);
  	//send_msg(user, RPL_YOUREOPER, "Operator privileges have been obtained");
  	//std::cout << "\nUSER[" << user_idx << "] Operator privileges have been obtained\n" << std::endl;
- }
+}
 
- void	Server::cmd_mode(User &user, std::vector<std::string> params)
- {
+void	Server::cmd_mode(User &user, std::vector<std::string> params)
+{
 	(void)user, (void)params;
  	//int user_idx = find_user_idx(user.get_fd());
 
@@ -152,9 +152,10 @@ void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
  	//}
  	//else
  	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
- }
+}
 
-void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but some part
+// user.get_room(name) 조건 추가해야함
+void	Server::cmd_join(User &user, std::vector<std::string> params)
 {
 	std::vector<std::string> rooms;
 	std::vector<std::string> keys;
@@ -190,7 +191,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 		}
 		else
 		{
-			if (keys.size() <= i || _rooms[j].get_key() != keys[i])
+			if (!keys[i].empty() && _rooms[j].get_key() != "" && _rooms[j].get_key() != keys[i])
 				send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[j].get_name()));
 			if (_rooms[j].get_users().size() > 10)
 				send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[j].get_name()));
@@ -236,8 +237,8 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 				reply = rooms[i] + " " + user->get_nickname() + " :" + params[2];
 			else
 				reply = rooms[i] + " " + user->get_nickname();
+			_rooms[room_idx].remove_user(*user);
 			_rooms[room_idx].send_all(":" + user->get_nickname() + " KICK " + reply + "\n");
-			_rooms[room_idx].remove_user(params[1]);
 			user->delete_room(rooms[i]);
 		}
  	}
@@ -252,17 +253,17 @@ void	Server::cmd_part(User &user, std::vector<std::string> params) // o.k
 
 	for (unsigned long i = 0; i < rooms.size(); i++)
 	{
+		Room &target_room = _rooms[find_room_idx(rooms[i])];
 		int	room_idx = user.get_room(rooms[i]);
+
 		if(find_room_idx(rooms[i]) == -1)
 			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 		if(room_idx == -1)
 			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
-		std::cout << "Users: " << user.get_rooms()[room_idx]->get_user_list() << std::endl;
 		user.get_rooms()[room_idx]->remove_user(user.get_nickname());
-		std::cout << "Users: " << user.get_rooms()[room_idx]->get_user_list() << std::endl;
 		user.delete_room(rooms[i]);
 		std::cout << "User room count: " << user.get_rooms().size() << std::endl;
-		user.get_rooms()[room_idx]->send_all(":" + user.get_nickname() + " PART " + _rooms[room_idx].get_name() + "\n");
+		target_room.send_all(":" + user.get_nickname() + " PART " + target_room.get_name() + "\n");
 	}
 }
 
