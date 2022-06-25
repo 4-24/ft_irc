@@ -312,18 +312,18 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 	{
 		for (size_t i = 0; i < _rooms.size(); i++)
 		{
-			msg += _rooms[i].get_name() + " : { ";
-			msg += _rooms[i].get_user_list() + "}" + ", ";
+			send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_user_list()));
+			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[i].get_name()));
 		}
-		msg += " * : {" + get_wait_list() + "}";
+		send_msg(user, RPL_NAMREPLY(user.get_nickname(), "*", get_wait_list()));
+		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), "*"));
 	}
 	else if (params.size() == 1)
 	{
 		int i = find_room_idx(params[0]);
-		msg += _rooms[i].get_name() + ": { ";
-		msg += _rooms[i].get_user_list() + "}";
+			send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_user_list()));
+			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[i].get_name()));
 	}
-	send_msg(user, RPL_NONE(msg));
 }
 
 void	Server::quit(User &user)
