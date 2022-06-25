@@ -22,12 +22,12 @@ void	Server::execute(User &user, Message message)
 			cmd_user(user, params);
 		else if (!user.is_authenticated() && !user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
 			send_err(user, ERR_NOTREGISTERED);
-		else if (is_flooding(user)) // 플러딩 체크
-			return ;
 		else if (command == "OPER")
 			cmd_oper(user, params);
 		else if (command == "MODE")
 			cmd_mode(user, params);
+		else if (is_flooding(user)) // 플러딩 체크
+			return ;
 		else if (command == "JOIN")
 			cmd_join(user, params);
 		else if (command == "KICK")
@@ -116,41 +116,43 @@ void	Server::cmd_user(User &user, std::vector<std::string> params) // o.k
 	}
 }
 
-// void	Server::cmd_oper(User &user, std::vector<std::string> params)
-// {
-// 	int user_idx = find_user_idx(user.get_fd());
+ void	Server::cmd_oper(User &user, std::vector<std::string> params)
+ {
+	(void)user, (void)params;
+ 	//int user_idx = find_user_idx(user.get_fd());
 
-// 	if (params.size() != 2)
-// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "OPER"));
-// 	if (params[0] != SUPER_NICK)
-// 		send_err(user, ERR_WRONGUSERNAME, "wrong host nick name");
-// 	if (params[1] != SUPER_PASS)
-// 		send_err(user, ERR_PASSWDMISMATCH, "wrong host password");
-// 	_users[user_idx].set_admin(true);
-// 	send_msg(user, RPL_YOUREOPER, "Operator privileges have been obtained");
-// 	std::cout << "\nUSER[" << user_idx << "] Operator privileges have been obtained\n" << std::endl;
-// }
+ 	//if (params.size() != 2)
+ 	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "OPER"));
+ 	//if (params[0] != SUPER_NICK)
+ 	//	send_err(user, ERR_WRONGUSERNAME, "wrong host nick name");
+ 	//if (params[1] != SUPER_PASS)
+ 	//	send_err(user, ERR_PASSWDMISMATCH, "wrong host password");
+ 	//_users[user_idx].set_admin(true);
+ 	//send_msg(user, RPL_YOUREOPER, "Operator privileges have been obtained");
+ 	//std::cout << "\nUSER[" << user_idx << "] Operator privileges have been obtained\n" << std::endl;
+ }
 
-// void	Server::cmd_mode(User &user, std::vector<std::string> params)
-// {
-// 	int user_idx = find_user_idx(user.get_fd());
+ void	Server::cmd_mode(User &user, std::vector<std::string> params)
+ {
+	(void)user, (void)params;
+ 	//int user_idx = find_user_idx(user.get_fd());
 
-// 	if (!_users[user_idx].is_admin())
-// 		send_err(user, ERR_NOPRIVILEGES, "you're not operator");
-// 	if (params[0].empty() || params[1].empty())
-// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
-// 	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
-// 	{
-// 		if (find_nickname(params[1]) == -1)
-// 			send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
-// 		if (params[0][0] == '+')
-// 			_users[find_nickname(params[1])].set_admin(true);
-// 		else
-// 			_users[find_nickname(params[1])].set_admin(false);
-// 	}
-// 	else
-// 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
-// }
+ 	//if (!_users[user_idx].is_admin())
+ 	//	send_err(user, ERR_NOPRIVILEGES, "you're not operator");
+ 	//if (params[0].empty() || params[1].empty())
+ 	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
+ 	//if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
+ 	//{
+ 	//	if (find_nickname(params[1]) == -1)
+ 	//		send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
+ 	//	if (params[0][0] == '+')
+ 	//		_users[find_nickname(params[1])].set_admin(true);
+ 	//	else
+ 	//		_users[find_nickname(params[1])].set_admin(false);
+ 	//}
+ 	//else
+ 	//	send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
+ }
 
 void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but some part
 {
@@ -173,11 +175,13 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 		{
 			if (rooms.size() >= MAX_ROOM_USER)
 				send_err(user, ERR_TOOMANYCHANNELS(user.get_nickname(), rooms[i]));
+
 			Room room(rooms[i]);
 			if (keys.size() > i)
 				room.set_key(keys[i]);
 			room.add_user(user);
 			_rooms.push_back(room);
+			std::cout << "Room " << rooms[i] << " created" << std::endl;
 			user.add_room(&(_rooms.back()));
 			room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
 			send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
@@ -251,10 +255,13 @@ void	Server::cmd_part(User &user, std::vector<std::string> params) // o.k
 		int	room_idx = user.get_room(rooms[i]);
 		if(room_idx == -1)
 			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
-		if(_rooms[room_idx].get_users().empty())
+		if(user.get_rooms()[room_idx]->get_users().empty())
 			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
+		std::cout << "Users: " << user.get_rooms()[room_idx]->get_user_list() << std::endl;
 		user.get_rooms()[room_idx]->remove_user(user.get_nickname());
+		std::cout << "Users: " << user.get_rooms()[room_idx]->get_user_list() << std::endl;
 		user.delete_room(rooms[i]);
+		std::cout << "User room count: " << user.get_rooms().size() << std::endl;
 		user.get_rooms()[room_idx]->send_all(":" + user.get_nickname() + " PART " + _rooms[room_idx].get_name() + "\n");
 	}
 }
