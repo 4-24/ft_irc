@@ -20,7 +20,7 @@ void	Server::execute(User &user, Message message)
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
 			cmd_user(user, params);
-		else if (!user.is_authenticated() && !user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
+		else if (!user.is_authenticated() || (!user.is_registered() && command != "NICK" && command != "USER")) // 등록되지 않은 사용자
 			send_err(user, ERR_NOTREGISTERED);
 		else if (command == "OPER")
 			cmd_oper(user, params);
