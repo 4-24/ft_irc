@@ -190,7 +190,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 		}
 		else
 		{
-			if (keys.size() <= i || _rooms[j].get_key() != keys[i])
+			if (!keys[i].empty() && _rooms[j].get_key() != "" && _rooms[j].get_key() != keys[i])
 				send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[j].get_name()));
 			if (_rooms[j].get_users().size() > 10)
 				send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[j].get_name()));
