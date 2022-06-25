@@ -31,9 +31,9 @@ void	Server::execute(User &user, Message message)
 		else if (command == "JOIN")
 			cmd_join(user, params);
 		else if (command == "KICK")
-			cmd_kick(user, param);
+			cmd_kick(user, params);
 		else if (command == "PART")
-			cmd_part(user, param);
+			cmd_part(user, params[0]);
 		else if (command == "PRIVMSG")
 			cmd_privmsg(user, params);
 		else if (command == "NOTICE")
@@ -185,7 +185,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 	{
 		if (user.get_room(params[0]) != -1)
 			return ;
-		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != param[1])
+		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != params[1])
 			send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[i].get_name()));
 		if (_rooms[i].get_users().size() > 10)
 			send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[i].get_name()));
@@ -236,47 +236,37 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
  	if (params.size() < 2)
  		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "KICK"));
 
-	room_idx = find_room_idx(params[0]);
+	int room_idx = find_room_idx(params[0]);
 	if (room_idx == -1)
 		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 	if (!_rooms[room_idx].is_admin(user.get_nickname()))
 		send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
+	if (!_rooms[room_idx].is_admin(user.get_nickname()))
+		send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), _rooms[room_idx].get_name()));
+	if (_rooms[room_idx].is_user(params[1]) == false)
+		send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
 
-	for (unsigned long i = 0; i < users.size(); i++)
-	{
-		if (!_rooms[room_idx].is_admin(user->get_nickname()))
-			send_err(*user, ERR_NOTONCHANNEL(user->get_nickname(), _rooms[room_idx].get_name()));
-
-		if (_rooms[room_idx]->is_user(params[1]) == false)
-			send_err(*user, ERR_NOSUCHNICK(user->get_nickname()));
-
-		_rooms[room_idx].remove_user(params[1]);
-		_rooms[room_idx].send_all(":" + user->get_nickname() + " KICK " + params[0] + " " + params[1] + "\n");
-		user->delete_room(params[0]);
- 	}
+	_rooms[room_idx].remove_user(params[1]);
+	_rooms[room_idx].send_all(":" + user.get_nickname() + " KICK " + params[0] + " " + params[1] + "\n");
+	user.delete_room(params[0]);
 }
 
 void	Server::cmd_part(User &user, std::string param) // o.k
 {
-	if (params.size() < 1)
+	if (param.empty())
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));
 
-	std::vector<std::string> rooms = split(params[0], ',');
+	Room &room = _rooms[find_room_idx(param)];
 
-	for (unsigned long i = 0; i < rooms.size(); i++)
-	{
-		Room &target_room = _rooms[find_room_idx(param)];
-		int	room_idx = user.get_room(param);
+	if(find_room_idx(param) == -1)
+		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), param));
+	if(room.is_user(user.get_nickname()))
+		send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), param));
 
-		if(find_room_idx(param) == -1)
-			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
-		if(room_idx == -1)
-			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
-		user.get_rooms()[room_idx]->remove_user(user.get_nickname());
-		user.delete_room(param);
-		std::cout << "User room count: " << user.get_rooms().size() << std::endl;
-		target_room.send_all(":" + user.get_nickname() + " PART " + target_room.get_name() + "\n");
-	}
+	room.remove_user(user.get_nickname());
+	user.delete_room(param);
+	std::cout << "User room count: " << user.get_rooms().size() << std::endl;
+	room.send_all(":" + user.get_nickname() + " PART " + room.get_name() + "\n");
 }
 
 void	Server::cmd_privmsg(User &user, std::vector<std::string> params) // o.k
@@ -341,8 +331,8 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 
 void	Server::quit(User &user)
 {
-	if (user.get_rooms().empty())
-		cmd_part(user, std::vector<std::string>(0));
+	if (user.get_rooms().empty() == false)
+		user.get_rooms().clear();
 	send_msg(user, RPL_NONE((std::string)"Goodbye!"));
 	close(user.get_fd());
 	std::cout << "User " << user.get_fd() << " disconnected." << std::endl;
