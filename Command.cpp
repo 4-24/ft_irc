@@ -167,9 +167,9 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 	int i = find_room_idx(params[0]);
 	if (i == -1) // 방이 없을 때
 	{
+		Room room(params[0]);
 		if (params[1].empty() == false)
 			room.set_key(params[1]);
-		Room room(params[0]);
 		room.add_user(user);
 		_rooms.push_back(room);
 		room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
@@ -179,7 +179,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 		}
 	else
 	{
-		if (_rooms[i].is_user() == false)
+		if (_rooms[i].is_user(user.get_nickname()) == false)
 			return ;
 		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != params[1])
 			send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[i].get_name()));
@@ -243,7 +243,6 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 
 	_rooms[room_idx].remove_user(params[1]);
 	_rooms[room_idx].send_all(":" + user.get_nickname() + " KICK " + params[0] + " " + params[1] + "\n");
-	user.delete_room(params[0]);
 }
 
 void	Server::cmd_part(User &user, std::string param) // o.k
@@ -258,7 +257,6 @@ void	Server::cmd_part(User &user, std::string param) // o.k
 	if(!room.is_user(user.get_nickname()))
 		send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), param));
 
-	user.delete_room(param);
 	room.send_all(":" + user.get_nickname() + " PART " + room.get_name() + "\n");
 	room.remove_user(user.get_nickname());
 	if (room.get_users().size() == 0)
