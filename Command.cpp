@@ -157,7 +157,7 @@ void	Server::cmd_mode(User &user, std::vector<std::string> params)
  		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
 }
 
-void	Server::cmd_join(User &user, std::vector<std::string> params)
+void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 {
 	if (params.size() < 1)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "JOIN"));
@@ -167,16 +167,11 @@ void	Server::cmd_join(User &user, std::vector<std::string> params)
 	int i = find_room_idx(params[0]);
 	if (i == -1) // 방이 없을 때
 	{
-		if (user.get_rooms().size() >= MAX_ROOM_USER)
-			send_err(user, ERR_TOOMANYCHANNELS(user.get_nickname(), params[0]));
-
-		Room room(params[0]);
 		if (params[1].empty() == false)
 			room.set_key(params[1]);
+		Room room(params[0]);
 		room.add_user(user);
 		_rooms.push_back(room);
-		std::cout << "Room " << params[0] << " created" << std::endl;
-		user.add_room(&(_rooms.back()));
 		room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
 		send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
 		send_msg(user, RPL_NAMREPLY(user.get_nickname(), room.get_name(), room.get_user_list()));
@@ -184,13 +179,12 @@ void	Server::cmd_join(User &user, std::vector<std::string> params)
 		}
 	else
 	{
-		if (user.get_room(params[0]) != -1)
+		if (_rooms[i].is_user() == false)
 			return ;
 		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != params[1])
 			send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[i].get_name()));
 		if (_rooms[i].get_users().size() > 10)
 			send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[i].get_name()));
-		user.add_room(&_rooms[i]);
 		_rooms[i].add_user(user);
 		_rooms[i].send_all(":" + user.get_nickname() + " JOIN " + _rooms[i].get_name() + "\n");
 		if (_rooms[i].get_topic() == "")
