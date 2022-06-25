@@ -204,7 +204,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k. but s
 	}
 }
 
-void	Server::cmd_kick(User &user, std::vector<std::string> params)
+void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 {
  	if (params.size() < 2)
  		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "KICK"));
