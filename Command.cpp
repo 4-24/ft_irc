@@ -253,9 +253,9 @@ void	Server::cmd_part(User &user, std::vector<std::string> params) // o.k
 	for (unsigned long i = 0; i < rooms.size(); i++)
 	{
 		int	room_idx = user.get_room(rooms[i]);
-		if(room_idx == -1)
+		if(find_room_idx(rooms[i]) == -1)
 			send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
-		if(user.get_rooms()[room_idx]->get_users().empty())
+		if(room_idx == -1)
 			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
 		std::cout << "Users: " << user.get_rooms()[room_idx]->get_user_list() << std::endl;
 		user.get_rooms()[room_idx]->remove_user(user.get_nickname());
