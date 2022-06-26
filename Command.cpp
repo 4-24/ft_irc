@@ -391,7 +391,6 @@ bool	Server::is_flooding(User &user)
 	if (user.get_message_timeout() < (2 << 6))
 		user.set_message_timeout(user.get_message_timeout() * 2);
 	std::stringstream ss;
-	ss.str("");
 	ss << user.get_message_timeout();
 	send_err(user, ERR_FLOOD(ss.str()));
 	return true;

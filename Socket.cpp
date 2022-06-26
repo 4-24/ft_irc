@@ -20,7 +20,6 @@ void	Socket::setup()
 	hints.ai_flags = AI_PASSIVE;
 
 	std::stringstream ss;
-	ss.str("");
 	ss << this->_port;
 	std::string str = ss.str();
 	const char *port = str.c_str();
