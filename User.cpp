@@ -8,6 +8,7 @@ User::User(int fd)
 	_is_admin = false;
 	_last_message_time = time(NULL);
 	_message_timeout = 1;
+	_room_count = 0;
 	_nickname = "";
 	_username = "";
 	_realname = "";
