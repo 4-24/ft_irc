@@ -10,6 +10,8 @@ void	Server::execute(User &user, Message message)
 	{
 		if (command == "QUIT")
 			quit(user);
+		else if (!user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
+			send_err(user, ERR_NOTREGISTERED);
 		else if (command == "PING")
 			cmd_ping(user, user.get_message());
 		else if (command == "PONG")
@@ -20,8 +22,7 @@ void	Server::execute(User &user, Message message)
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
 			cmd_user(user, params);
-		else if (!user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
-			send_err(user, ERR_NOTREGISTERED);
+
 		else if (command == "OPER")
 			cmd_oper(user, params);
 		else if (command == "MODE")
@@ -161,8 +162,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 {
 	if (params.size() < 1)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "JOIN"));
-
-	if (is_valid_room_name(params[0]) == true)
+	if (is_valid_room_name(params[0]) == false)
 		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 	int i = find_room_idx(params[0]);
 	if (i == -1) // 방이 없을 때
@@ -318,8 +318,8 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 	else if (params.size() == 1)
 	{
 		int i = find_room_idx(params[0]);
-			send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_user_list()));
-			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[i].get_name()));
+		send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_user_list()));
+		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[i].get_name()));
 	}
 }
 
