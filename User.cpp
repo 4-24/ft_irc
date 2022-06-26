@@ -1,5 +1,4 @@
 # include "User.hpp"
-# include "Room.hpp"
 
 User::User(int fd)
 {
@@ -25,21 +24,6 @@ void	User::add_buffer(std::string message)
 	std::cout << "------------------------------------" << std::endl;
 	std::cout << "message: " << _buffer << std::endl;
 	std::cout << "------------------------------------" << std::endl;
-}
-
-void	User::add_room(Room *room)
-{
-	_rooms.push_back(room);
-}
-
-void	User::delete_room(std::string name)
-{
-	for (size_t i = 0; i < _rooms.size(); i++)
-		if (_rooms[i]->get_name() == name)
-		{
-			_rooms.erase(_rooms.begin() + i);
-			break;
-		}
 }
 
 void	User::clear_message()
@@ -102,14 +86,6 @@ std::string	User::get_realname() const
 int	User::get_fd() const
 {
 	return (_fd);
-}
-
-int	User::get_room(std::string name) const
-{
-	for (size_t i = 0; i < _rooms.size(); i++)
-		if (_rooms[i]->get_name() == name)
-			return i;
-	return -1;
 }
 
 Message	User::get_message() const
@@ -185,9 +161,4 @@ void	User::set_message_timeout(time_t message_timeout)
 void	User::set_admin(bool admin)
 {
 	_is_admin = admin;
-}
-
-std::vector<Room *>	User::get_rooms() const
-{
-	return _rooms;
 }

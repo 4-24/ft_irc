@@ -3,8 +3,6 @@
 
 # include "Message.hpp"
 
-class Room;
-
 class User
 {
 	private:
@@ -13,7 +11,6 @@ class User
 		bool		_is_registered;
 		bool		_is_authenticated;
 		bool		_is_admin;
-		std::vector<Room *>	_rooms;
 		std::string	_buffer;
 		std::string	_nickname;
 		std::string	_username;
@@ -28,8 +25,6 @@ class User
 
 		void		setup_message();
 		void		add_buffer(std::string message);
-		void		add_room(Room *room);
-		void		delete_room(std::string name);
 		void		clear_message();
 
 		bool		is_registered();
@@ -53,8 +48,6 @@ class User
 		std::string	get_nickname() const;
 		std::string	get_username() const;
 		std::string	get_realname() const;
-		int			get_room(std::string name) const;
-		std::vector<Room *>	get_rooms() const;
 		time_t		get_last_message_time() const;
 		time_t		get_message_timeout() const;
 		bool		is_admin() const;
