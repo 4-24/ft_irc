@@ -22,7 +22,6 @@ void	Server::execute(User &user, Message message)
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
 			cmd_user(user, params);
-
 		else if (command == "OPER")
 			cmd_oper(user, params);
 		else if (command == "MODE")

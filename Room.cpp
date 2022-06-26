@@ -43,7 +43,6 @@ std::string	Room::get_user_list()
 	if (_users.size() > 0)
 	{
 		for (unsigned long i = 0; i < _users.size(); i++)
-
 			ss << _users[i]->get_nickname() << " ";
 	}
 	return ss.str();

@@ -51,12 +51,14 @@ void	User::setup_message()
 
 void	User::up_room_count()
 {
-	_room_count++;
+	if (_room_count >= 0)
+		_room_count++;
 }
 
 void	User::down_room_count()
 {
-	_room_count--;
+	if (_room_count >= 0)
+		_room_count--;
 }
 
 bool	User::is_registered()
