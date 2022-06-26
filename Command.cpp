@@ -167,14 +167,15 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 	if (i == -1) // 방이 없을 때
 	{
 		Room room(params[0]);
+		Room &room_ref = room;
 		if (params[1].empty() == false)
-			room.set_key(params[1]);
-		room.add_user(user);
-		_rooms.push_back(room);
-		room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
-		send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
-		send_msg(user, RPL_NAMREPLY(user.get_nickname(), room.get_name(), room.get_user_list()));
-		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), room.get_name()));
+			room_ref.set_key(params[1]);
+		room_ref.add_user(user);
+		_rooms.push_back(room_ref);
+		room_ref.send_all(":" + user.get_nickname() + " JOIN " + room_ref.get_name() + "\n");
+		send_msg(user, RPL_NOTOPIC(user.get_nickname(), room_ref.get_name()));
+		send_msg(user, RPL_NAMREPLY(user.get_nickname(), room_ref.get_name(), room_ref.get_user_list()));
+		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), room_ref.get_name()));
 	}
 	else
 	{
@@ -203,6 +204,7 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 		for(unsigned long i = 0; i < _rooms.size(); i++)
 		{
 			std::stringstream	tmp;
+			tmp.str("");
 			tmp << _rooms[i].get_users().size();
 			send_msg(user, RPL_LIST(user.get_nickname(), _rooms[i].get_name(), tmp.str(), _rooms[i].get_topic()));
 		}
@@ -217,6 +219,7 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 			else
 			{
 				std::stringstream	tmp;
+				tmp.str("");
 				tmp << _rooms[find_room_idx(rooms[i])].get_users().size();
 				send_msg(user, RPL_LIST(user.get_nickname(), _rooms[find_room_idx(rooms[i])].get_name(), tmp.str(), _rooms[find_room_idx(rooms[i])].get_topic()));
 			}

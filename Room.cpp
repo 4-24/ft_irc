@@ -39,6 +39,7 @@ void	Room::remove_user(std::string name)
 std::string	Room::get_user_list()
 {
 	std::stringstream ss;
+	ss.str("");
 
 	if (_users.size() > 0)
 	{

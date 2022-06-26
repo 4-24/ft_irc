@@ -92,6 +92,7 @@ int	Server::find_fd_idx(int fd)
 std::string	Server::get_wait_list()
 {
 	std::stringstream ss;
+	ss.str("");
 
 	if (_users.size() > 0)
 	{
