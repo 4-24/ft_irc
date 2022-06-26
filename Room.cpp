@@ -11,6 +11,7 @@ Room::~Room () {}
 
 void	Room::add_user(User &user)
 {
+	user.up_room_count();
 	_users.push_back(&user);
 }
 
@@ -29,6 +30,7 @@ void	Room::remove_user(std::string name)
 	for (size_t i = 0; i < _users.size(); i++)
 		if (_users[i]->get_nickname() == name)
 		{
+			_users[i]->down_room_count();
 			_users.erase(_users.begin() + i);
 			break;
 		}
@@ -41,6 +43,7 @@ std::string	Room::get_user_list()
 	if (_users.size() > 0)
 	{
 		for (unsigned long i = 0; i < _users.size(); i++)
+
 			ss << _users[i]->get_nickname() << " ";
 	}
 	return ss.str();
@@ -94,6 +97,17 @@ bool Room::is_user(std::string name) const
 				return true;
 	}
 	return false;
+}
+
+int	Room::get_user_idx(std::string name) const
+{
+	if (_users.size() > 0)
+	{
+		for (unsigned long i = 0; i < _users.size(); i++)
+			if (_users[i]->get_nickname() == name)
+				return i;
+	}
+	return -1;
 }
 
 bool	Room::is_admin(std::string name) const

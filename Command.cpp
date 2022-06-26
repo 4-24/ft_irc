@@ -325,29 +325,28 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 
 void	Server::cmd_topic(User &user, std::vector<std::string> params)
 {
-	int server_room = -1;
-	int user_room = -1;
+	int room_idx;
 
 	if  (params.empty() || (params.size() != 1 && params.size() != 2))
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "TOPIC"));
-	if ((server_room = find_room_idx(params[0])) == -1)
+	if ((room_idx = find_room_idx(params[0])) == -1)
 		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 	if (params.size() == 1)
 	{
-		if (_rooms[server_room].get_topic().empty())
+		if (_rooms[room_idx].get_topic().empty())
 			send_msg(user, RPL_NOTOPIC(user.get_nickname(), params[0]));
 		else
-			send_msg(user, RPL_TOPIC(user.get_nickname(), params[0], _rooms[server_room].get_topic()));
+			send_msg(user, RPL_TOPIC(user.get_nickname(), params[0], _rooms[room_idx].get_topic()));
 	}
 	else
 	{
-		if ((user_room = user.get_room(params[0])) == -1)
+		if (!_rooms[room_idx].is_user(user.get_nickname()))
 			send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), params[0]));
-		if ((_rooms[server_room].is_admin(user.get_nickname())) == false)
+		if ((_rooms[room_idx].is_admin(user.get_nickname())) == false)
 			send_err(user, ERR_CHANOPRIVSNEEDED(user.get_nickname(), params[0]));
-		user.get_rooms()[user_room]->set_topic(params[1]);
-		user.get_rooms()[user_room]->send_all(RPL_SETTOPIC(params[0], params[1]));
-		user.get_rooms()[user_room]->send_all(RPL_TOPIC(user.get_nickname(), params[0], _rooms[server_room].get_topic()));
+		_rooms[room_idx].set_topic(params[1]);
+		_rooms[room_idx].send_all(RPL_SETTOPIC(params[0], params[1]));
+		_rooms[room_idx].send_all(RPL_TOPIC(user.get_nickname(), params[0], _rooms[room_idx].get_topic()));
 	}
 }
 
@@ -357,13 +356,14 @@ void	Server::quit(User &user)
 	{
 		for (size_t i = 0; i < _rooms.size(); i++)
 		{
-			if (_rooms[i].is_user(user.get_nickname()))
+			int j = _rooms[i].get_user_idx(user.get_nickname());
+			if (j != -1)
 			{
 				_rooms[i].remove_user(user.get_nickname());
-				_rooms[i].send_all(RPL_QUIT(user.get_nickname()));
+				_rooms[i].send_all(":" + user.get_nickname() + " QUIT :bye~~\n");
+				if (_rooms[i].get_users().size() == 0)
+					_rooms.erase(_rooms.begin() + i);
 			}
-			if (_rooms[i].get_users().size() == 0)
-				_rooms[i].erase(_rooms[i].begin() + i);
 		}
 	}
 	send_msg(user, RPL_NONE((std::string)"Goodbye!"));

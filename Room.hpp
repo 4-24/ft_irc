@@ -25,11 +25,11 @@ class	Room
 		void				set_topic(std::string topic);
 		void				set_key(std::string key);
 
-
 		std::string			get_name() const;
 		std::string			get_topic() const;
 		std::string			get_key() const;
 		std::vector<User *>	get_users() const;
+		int					get_user_idx(std::string name) const;
 		std::string			get_user_list();
 		bool				is_user(std::string name) const;
 		bool				is_admin(std::string name) const;
