@@ -179,7 +179,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 		}
 	else
 	{
-		if (_rooms[i].is_user(user.get_nickname()) == false)
+		if (_rooms[i].is_user(user.get_nickname()))
 			return ;
 		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != params[1])
 			send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[i].get_name()));
@@ -236,7 +236,7 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 		send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), params[0]));
 	if (!_rooms[room_idx].is_admin(user.get_nickname()))
 		send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
-	if (!_rooms[room_idx].is_admin(user.get_nickname()))
+	if (!_rooms[room_idx].is_user(user.get_nickname()))
 		send_err(user, ERR_NOTONCHANNEL(user.get_nickname(), _rooms[room_idx].get_name()));
 	if (_rooms[room_idx].is_user(params[1]) == false)
 		send_err(user, ERR_NOSUCHNICK(user.get_nickname()));
