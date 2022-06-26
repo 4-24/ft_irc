@@ -5,6 +5,7 @@ int main(int argc, char **argv)
 	if (argc == 2)
 	{
 		std::stringstream ss;
+		ss.str("");
 		ss << argv[1];
 		int num;
 		ss >> num;
@@ -16,6 +17,7 @@ int main(int argc, char **argv)
 	else if (argc == 3)
 	{
 		std::stringstream ss;
+		ss.str("");
 		ss << argv[1];
 		int num;
 		ss >> num;

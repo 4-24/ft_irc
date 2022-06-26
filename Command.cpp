@@ -203,6 +203,7 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 		for(unsigned long i = 0; i < _rooms.size(); i++)
 		{
 			std::stringstream	tmp;
+			tmp.str("");
 			tmp << _rooms[i].get_users().size();
 			send_msg(user, RPL_LIST(user.get_nickname(), _rooms[i].get_name(), tmp.str(), _rooms[i].get_topic()));
 		}
@@ -217,6 +218,7 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 			else
 			{
 				std::stringstream	tmp;
+				tmp.str("");
 				tmp << _rooms[find_room_idx(rooms[i])].get_users().size();
 				send_msg(user, RPL_LIST(user.get_nickname(), _rooms[find_room_idx(rooms[i])].get_name(), tmp.str(), _rooms[find_room_idx(rooms[i])].get_topic()));
 			}
@@ -389,6 +391,7 @@ bool	Server::is_flooding(User &user)
 	if (user.get_message_timeout() < (2 << 6))
 		user.set_message_timeout(user.get_message_timeout() * 2);
 	std::stringstream ss;
+	ss.str("");
 	ss << user.get_message_timeout();
 	send_err(user, ERR_FLOOD(ss.str()));
 	return true;
