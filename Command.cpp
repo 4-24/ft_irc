@@ -353,8 +353,19 @@ void	Server::cmd_topic(User &user, std::vector<std::string> params)
 
 void	Server::quit(User &user)
 {
-	if (user.get_rooms().empty() == false)
-		user.get_rooms().clear();
+	if (user.get_room_count() != 0)
+	{
+		for (size_t i = 0; i < _rooms.size(); i++)
+		{
+			if (_rooms[i].is_user(user.get_nickname()))
+			{
+				_rooms[i].remove_user(user.get_nickname());
+				_rooms[i].send_all(RPL_QUIT(user.get_nickname()));
+			}
+			if (_rooms[i].get_users().size() == 0)
+				_rooms[i].erase(_rooms[i].begin() + i);
+		}
+	}
 	send_msg(user, RPL_NONE((std::string)"Goodbye!"));
 	close(user.get_fd());
 	std::cout << "User " << user.get_fd() << " disconnected." << std::endl;
