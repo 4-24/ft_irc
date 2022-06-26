@@ -12,7 +12,6 @@
 # define ERR_NOSUCHSERVER(serv)						":ircserv 402 " + serv + " :No such server\n"
 # define ERR_NOSUCHCHANNEL(nick, channel)			":ircserv 403 " + nick + " " + channel + " :No such channel\n"
 # define ERR_CANNOTSENDTOCHAN(nick, channel)		":ircserv 404 " + nick + " " + channel + " :Cannot send to channel\n"
-# define ERR_TOOMANYCHANNELS(nick, channel)			":ircserv 405 " + nick + " " + channel + " :You have joined too many channels\n"
 # define ERR_NOORIGIN								":ircserv 409 * :No origin specified\n"
 # define ERR_NORECIPIENT(nick, command)				":ircserv 411 " + nick + " :No recipient given " + command + "\n"
 # define ERR_UNKNOWNCOMMAND							":ircserv 421 * :Command not found\n"
