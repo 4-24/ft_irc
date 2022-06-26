@@ -39,7 +39,8 @@ void	Message::parse_command(std::string message, int &i)
 		i++;
 	if (i > j)
 		_command.append(&message[j], i - j);
-	// 대문자로 변환시켜주어야 함
+	for (int k = 0; k < _command.size(); k++)
+		_command[k] = toupper(_command[k]);
 }
 
 void	Message::parse_params(std::string message, int &i)

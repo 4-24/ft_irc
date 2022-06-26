@@ -179,7 +179,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 		}
 	else
 	{
-		if (_rooms[i].is_user(user.get_nickname()) == false)
+		if (_rooms[i].is_user(user.get_nickname()))
 			return ;
 		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != params[1])
 			send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[i].get_name()));
