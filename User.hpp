@@ -7,6 +7,7 @@ class User
 {
 	private:
 		int			_fd;
+		int			_room_count;
 		Message		_message;
 		bool		_is_registered;
 		bool		_is_authenticated;
@@ -26,6 +27,8 @@ class User
 		void		setup_message();
 		void		add_buffer(std::string message);
 		void		clear_message();
+		void		up_room_count();
+		void		down_room_count();
 
 		bool		is_registered();
 		bool		is_authenticated();
@@ -43,6 +46,7 @@ class User
 
 		std::string	get_buffer() const;
 		int			get_fd() const;
+		int			get_room_count() const;
 		Message		get_message() const;
 		std::string	get_prefix() const;
 		std::string	get_nickname() const;

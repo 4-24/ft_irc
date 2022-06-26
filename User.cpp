@@ -48,6 +48,16 @@ void	User::setup_message()
 	}
 }
 
+void	User::up_room_count()
+{
+	_room_count++;
+}
+
+void	User::down_room_count()
+{
+	_room_count--;
+}
+
 bool	User::is_registered()
 {
 	return _is_registered;
@@ -161,4 +171,9 @@ void	User::set_message_timeout(time_t message_timeout)
 void	User::set_admin(bool admin)
 {
 	_is_admin = admin;
+}
+
+int	User::get_room_count() const
+{
+	return _room_count;
 }
