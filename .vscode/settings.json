@@ -1,6 +1,0 @@
-{
-	"files.associations": {
-		"*.swift": "swift",
-		"iosfwd": "cpp"
-	}
-}
