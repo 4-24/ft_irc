@@ -17,7 +17,7 @@ void	Server::send_motd(User user)
 void	Server::send_err(User user, std::string message)
 {
 	send(user.get_fd(), message.c_str(), message.size(), 0);
-	throw std::runtime_error((message + "\n").c_str());
+	throw std::runtime_error(message.c_str());
 }
 
 void	Server::send_privmsg_to_room(User &from, int idx, std::string message)
