@@ -22,14 +22,14 @@ void	Server::send_err(User user, std::string message)
 
 void	Server::send_privmsg_to_room(User &from, int idx, std::string message)
 {
-	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
+	for (unsigned int i = 0; i < _rooms[idx].get_users().size(); i++)
 		if (_rooms[idx].get_users()[i]->get_fd() != from.get_fd())
 			send_privmsg(*(_rooms[idx].get_users()[i]), from, message);
 }
 
 void	Server::send_notice_to_room(User &from, int idx, std::string message)
 {
-	for (size_t i = 0; i < _rooms[idx].get_users().size(); i++)
+	for (unsigned int i = 0; i < _rooms[idx].get_users().size(); i++)
 		if (_rooms[idx].get_users()[i]->get_fd() != from.get_fd())
 			send_notice(*(_rooms[idx].get_users()[i]), from, message);
 }

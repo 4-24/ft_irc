@@ -4,7 +4,6 @@ Room::Room (std::string name)
 {
 	_name = name;
 	_topic = "";
-	_key = "";
 }
 
 Room::~Room () {}
@@ -17,7 +16,7 @@ void	Room::add_user(User &user)
 
 void	Room::remove_user(User &user)
 {
-	for (size_t i = 0; i < _users.size(); i++)
+	for (unsigned int i = 0; i < _users.size(); i++)
 		if (_users[i] == &user)
 		{
 			_users.erase(_users.begin() + i);
@@ -27,7 +26,7 @@ void	Room::remove_user(User &user)
 
 void	Room::remove_user(std::string name)
 {
-	for (size_t i = 0; i < _users.size(); i++)
+	for (unsigned int i = 0; i < _users.size(); i++)
 		if (_users[i]->get_nickname() == name)
 		{
 			_users[i]->down_room_count();
@@ -43,7 +42,7 @@ std::string	Room::get_user_list()
 
 	if (_users.size() > 0)
 	{
-		for (unsigned long i = 0; i < _users.size(); i++)
+		for (unsigned int i = 0; i < _users.size(); i++)
 			ss << _users[i]->get_nickname() << " ";
 	}
 	return ss.str();
@@ -53,7 +52,7 @@ void	Room::send_all(std::string msg)
 {
 	if (_users.size() > 0)
 	{
-		for (unsigned long i = 0; i < _users.size(); i++)
+		for (unsigned int i = 0; i < _users.size(); i++)
 			send(_users[i]->get_fd(), msg.c_str(), msg.size(), 0);
 	}
 }
@@ -63,23 +62,14 @@ void	Room::set_topic(std::string topic)
 	_topic = topic;
 }
 
-void	Room::set_key(std::string key)
-{
-	_key = key;
-}
-
 std::string	Room::get_topic() const
 {
 	return _topic;
 }
 
-std::string	Room::get_key() const
-{
-	return _key;
-}
-
 std::string	Room::get_name() const
 {
+	std::cout << "get_name : " << _name << std::endl;
 	return (_name);
 }
 
@@ -92,7 +82,7 @@ bool Room::is_user(std::string name) const
 {
 	if (_users.size() > 0)
 	{
-		for (unsigned long i = 0; i < _users.size(); i++)
+		for (unsigned int i = 0; i < _users.size(); i++)
 			if (_users[i]->get_nickname() == name)
 				return true;
 	}
@@ -103,7 +93,7 @@ int	Room::get_user_idx(std::string name) const
 {
 	if (_users.size() > 0)
 	{
-		for (unsigned long i = 0; i < _users.size(); i++)
+		for (unsigned int i = 0; i < _users.size(); i++)
 			if (_users[i]->get_nickname() == name)
 				return i;
 	}

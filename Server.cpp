@@ -29,7 +29,7 @@ void	Server::start()
 				create_poll(_socket->get_connect(), false);
 				std::cout << "User connected: " << _socket->get_connect() << std::endl;
 			}
-			for (size_t i = 1; i < _fds.size(); i++)
+			for (unsigned int i = 1; i < _fds.size(); i++)
 			{
 				if (_fds[i].revents & POLLIN) // 클라이언트 소켓에서 POLLIN 이벤트가 발생한 경우
 				{
@@ -62,7 +62,7 @@ void	Server::create_poll(int fd, bool is_server)
 
 User &Server::find_user(int fd)
 {
-	for (size_t i = 0; i < _users.size(); i++)
+	for (unsigned int i = 0; i < _users.size(); i++)
 		if (_users[i].get_fd() == fd)
 			return _users[i];
 
@@ -71,7 +71,7 @@ User &Server::find_user(int fd)
 
 int	Server::find_user_idx(int fd)
 {
-	for (size_t i = 0; i < _users.size(); i++)
+	for (unsigned int i = 0; i < _users.size(); i++)
 	{
 		if (_users[i].get_fd() == fd)
 			return i;
@@ -82,7 +82,7 @@ int	Server::find_user_idx(int fd)
 
 int	Server::find_fd_idx(int fd)
 {
-	for (size_t i = 1; i < _fds.size(); i++)
+	for (unsigned int i = 1; i < _fds.size(); i++)
 		if (_fds[i].fd == fd)
 			return i;
 
@@ -96,7 +96,7 @@ std::string	Server::get_wait_list()
 
 	if (_users.size() > 0)
 	{
-		for (unsigned long i = 0; i < _users.size(); i++)
+		for (unsigned int i = 0; i < _users.size(); i++)
 		{
 			if (_users[i].get_room_count() == 0)
 				ss << _users[i].get_nickname() << " ";
@@ -136,7 +136,7 @@ void	Server::chat(User &user)
 
 int	Server::find_room_idx(std::string name)
 {
-	for (size_t i = 0; i < _rooms.size(); i++)
+	for (unsigned int i = 0; i < _rooms.size(); i++)
 		if (_rooms[i].get_name() == name)
 			return i;
 
@@ -145,7 +145,7 @@ int	Server::find_room_idx(std::string name)
 
 int	Server::find_nickname(std::string name)
 {
-	for (size_t i = 0; i < _users.size(); i++)
+	for (unsigned int i = 0; i < _users.size(); i++)
 		if (_users[i].get_nickname() == name)
 			return i;
 	return -1;
@@ -153,7 +153,7 @@ int	Server::find_nickname(std::string name)
 
 int	Server::find_username(std::string name)
 {
-	for (size_t i = 0; i < _users.size(); i++)
+	for (unsigned int i = 0; i < _users.size(); i++)
 		if (_users[i].get_username() == name)
 			return i;
 
