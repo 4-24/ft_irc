@@ -43,7 +43,7 @@ void	User::setup_message()
 	if (_message.get_params().size() > 0)
 	{
 		std::cout << "params: ";
-		for (unsigned long i = 0; i < _message.get_params().size(); i++)
+		for (unsigned int i = 0; i < _message.get_params().size(); i++)
 			std::cout << _message.get_params()[i] << " ";
 		std::cout << std::endl;
 	}

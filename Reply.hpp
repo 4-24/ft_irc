@@ -27,7 +27,6 @@
 # define ERR_PASSWDMISMATCH(nick)					":ircserv 464 " + nick + " :Password incorrect\n"
 # define ERR_CHANNELISFULL(nick, channel)			":ircserv 471 " + nick + " " + channel + " :Cannot join channel (+l)\n"
 # define ERR_UNKNOWNMODE(nick, flags)				":ircserv 472 " + nick + " " +  flags + " :is unknown mode char to me\n"
-# define ERR_BADCHANNELKEY(nick, channel)			":ircserv 475 " + nick + " " + channel + " :Cannot join channel (+k)\n"
 # define ERR_NOPRIVILEGES(nick)						":ircserv 481 " + nick + " :Permission Denied- You're not an IRC operator\n"
 # define ERR_CHANOPRIVSNEEDED(nick, channel)		":ircserv 482 " + nick + " " + channel + " :You're not channel operator\n"
 # define ERR_NOOPERHOST(nick)						":ircserv 491 " + nick + " :No O-lines for your host\n"

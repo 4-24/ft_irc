@@ -39,7 +39,7 @@ void	Message::parse_command(std::string message, int &i)
 		i++;
 	if (i > j)
 		_command.append(&message[j], i - j);
-	for (size_t k = 0; k < _command.size(); k++)
+	for (unsigned int k = 0; k < _command.size(); k++)
 		_command[k] = toupper(_command[k]);
 }
 

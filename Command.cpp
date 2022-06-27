@@ -10,8 +10,6 @@ void	Server::execute(User &user, Message message)
 	{
 		if (command == "QUIT")
 			quit(user);
-		else if (!user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
-			send_err(user, ERR_NOTREGISTERED);
 		else if (command == "PING")
 			cmd_ping(user, user.get_message());
 		else if (command == "PONG")
@@ -22,6 +20,8 @@ void	Server::execute(User &user, Message message)
 			cmd_nick(user, params[0]);
 		else if (command == "USER")
 			cmd_user(user, params);
+		else if (!user.is_registered() && command != "NICK" && command != "USER") // 등록되지 않은 사용자
+			send_err(user, ERR_NOTREGISTERED);
 		else if (command == "OPER")
 			cmd_oper(user, params);
 		else if (command == "MODE")
@@ -55,8 +55,6 @@ void	Server::execute(User &user, Message message)
 
 void	Server::cmd_pass(User &user, std::vector<std::string> params) // o.k
 {
-	if (user.is_authenticated())
-		send_err(user, ERR_ALREADYREGISTRED(user.get_nickname()));
 	if (params.size() == 1)
 	{
 		if (params[0] == _password)
@@ -67,6 +65,8 @@ void	Server::cmd_pass(User &user, std::vector<std::string> params) // o.k
 		else
 			send_err(user, ERR_PASSWDMISMATCH(user.get_nickname()));
 	}
+	else if (user.is_authenticated())
+		send_err(user, ERR_ALREADYREGISTRED(user.get_nickname()));
 }
 
 bool check_nick(std::string const &str) {
@@ -167,22 +167,17 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 	if (i == -1) // 방이 없을 때
 	{
 		Room room(params[0]);
-		Room &room_ref = room;
-		if (params[1].empty() == false)
-			room_ref.set_key(params[1]);
-		room_ref.add_user(user);
-		_rooms.push_back(room_ref);
-		room_ref.send_all(":" + user.get_nickname() + " JOIN " + room_ref.get_name() + "\n");
-		send_msg(user, RPL_NOTOPIC(user.get_nickname(), room_ref.get_name()));
-		send_msg(user, RPL_NAMREPLY(user.get_nickname(), room_ref.get_name(), room_ref.get_user_list()));
-		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), room_ref.get_name()));
+		room.add_user(user);
+		_rooms.push_back(room);
+		room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
+		send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
+		send_msg(user, RPL_NAMREPLY(user.get_nickname(), room.get_name(), room.get_user_list()));
+		send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), room.get_name()));
 	}
 	else
 	{
 		if (_rooms[i].is_user(user.get_nickname()))
 			return ;
-		if (params[1].empty() == false && _rooms[i].get_key() != "" &&_rooms[i].get_key() != params[1])
-			send_err(user, ERR_BADCHANNELKEY(user.get_nickname(), _rooms[i].get_name()));
 		if (_rooms[i].get_users().size() > 10)
 			send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[i].get_name()));
 		_rooms[i].add_user(user);
@@ -201,7 +196,7 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 	send_msg(user, RPL_LISTSTART(user.get_nickname()));
 	if (params.size() == 0)
 	{
-		for(unsigned long i = 0; i < _rooms.size(); i++)
+		for(unsigned int i = 0; i < _rooms.size(); i++)
 		{
 			std::stringstream	tmp;
 			tmp.str("");
@@ -212,7 +207,7 @@ void	Server::cmd_list(User &user, std::vector<std::string> params)
 	else if (params.size() == 1)
 	{
 		std::vector<std::string>	rooms = split(params[0], ',');
-		for(unsigned long i = 0; i < rooms.size(); i++)
+		for(unsigned int i = 0; i < rooms.size(); i++)
 		{
 			if (find_room_idx(rooms[i]) == -1)
 				send_err(user, ERR_NOSUCHCHANNEL(user.get_nickname(), rooms[i]));
@@ -309,7 +304,7 @@ void	Server::cmd_names(User &user, std::vector<std::string> params)
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "NAMES"));
 	else if (params.size() == 0)
 	{
-		for (size_t i = 0; i < _rooms.size(); i++)
+		for (unsigned int i = 0; i < _rooms.size(); i++)
 		{
 			send_msg(user, RPL_NAMREPLY(user.get_nickname(), _rooms[i].get_name(), _rooms[i].get_user_list()));
 			send_msg(user, RPL_ENDOFNAMES(user.get_nickname(), _rooms[i].get_name()));
@@ -356,7 +351,7 @@ void	Server::quit(User &user)
 {
 	if (user.get_room_count() != 0)
 	{
-		for (size_t i = 0; i < _rooms.size(); i++)
+		for (unsigned int i = 0; i < _rooms.size(); i++)
 		{
 			int j = _rooms[i].get_user_idx(user.get_nickname());
 			if (j != -1)
