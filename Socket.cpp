@@ -47,6 +47,11 @@ void	Socket::create()
 		throw std::runtime_error("reuseaddr");
 		exit(2);
 	}
+	if (fcntl(_listen, F_SETFL, O_NONBLOCK) < 0)
+	{
+		throw std::runtime_error("fcntl");
+		exit(2);
+	}
 	if (bind(_listen, _info->ai_addr, _info->ai_addrlen) == -1)
 	{
 		throw std::runtime_error("bind");
