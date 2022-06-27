@@ -244,7 +244,7 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 
 void	Server::cmd_part(User &user, std::string param) // o.k
 {
-	if (param && param.empty())
+	if (param.empty())
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));
 
 	Room &room = _rooms[find_room_idx(param)];
