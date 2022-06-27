@@ -142,7 +142,7 @@ void	Server::cmd_mode(User &user, std::vector<std::string> params)
 		return ;
  	if (!_users[user_idx].is_admin())
  		send_err(user, ERR_NOPRIVILEGES(user.get_nickname()));
- 	if (params[0].empty() || params[1].empty())
+ 	if (params.size() >= 2 && (params[0].empty() || params[1].empty()))
  		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "MODE"));
  	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
  	{
@@ -244,7 +244,7 @@ void	Server::cmd_kick(User &user, std::vector<std::string> params) // o.k
 
 void	Server::cmd_part(User &user, std::string param) // o.k
 {
-	if (param.empty())
+	if (param && param.empty())
 		send_err(user, ERR_NEEDMOREPARAMS(user.get_nickname(), "PART"));
 
 	Room &room = _rooms[find_room_idx(param)];
@@ -267,7 +267,7 @@ void	Server::cmd_privmsg(User &user, std::vector<std::string> params) // o.k
 	if (params.size() < 2)
 		send_err(user, ERR_NOTEXTTOSEND(user.get_nickname()));
 
-	if  (params[0][0] == '#') // 방에서 메시지를 보낼 때
+	if (params[0][0] == '#') // 방에서 메시지를 보낼 때
 	{
 		if (find_room_idx(params[0]) == -1)
 			send_err(user, ERR_CANNOTSENDTOCHAN(user.get_nickname(), params[0]));
