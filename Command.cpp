@@ -8,7 +8,6 @@ void	Server::execute(User &user, Message message)
 
 	try
 	{
-		send_msg(user, RPL_NAMREPLY(user.get_nickname(), "*", get_wait_list()));
 		if (command == "QUIT")
 			quit(user);
 		else if (command == "PING")
