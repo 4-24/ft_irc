@@ -112,9 +112,9 @@ std::string	User::get_buffer() const
 
 std::string User::get_nickname() const
 {
-	return _nickname;
+	std::string new_nickname  = _nickname;
+	return new_nickname;
 }
-
 std::string	User::get_username() const
 {
 	return _username;
