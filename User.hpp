@@ -23,6 +23,8 @@ class User
 	public:
 		User(int fd);
 		~User();
+		User(const User& user);
+		User&	operator=(const User &user);
 
 		void		setup_message();
 		void		add_buffer(std::string message);

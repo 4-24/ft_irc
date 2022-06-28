@@ -6,12 +6,27 @@ Room::Room (std::string name)
 	_topic = "";
 }
 
+Room::Room(const Room& room)
+{
+	_name = room._name;
+	_topic = room._topic;
+	_users = room._users;
+}
+
+Room&	Room::operator=(const Room &room)
+{
+	_name = room._name;
+	_topic = room._topic;
+	_users = room._users;
+	return (*this);
+}
+
 Room::~Room () {}
 
-void	Room::add_user(User &user)
+void	Room::add_user(User *user)
 {
-	user.up_room_count();
-	_users.push_back(&user);
+	user->up_room_count();
+	_users.push_back(user);
 }
 
 void	Room::remove_user(User &user)
@@ -39,11 +54,16 @@ std::string	Room::get_user_list()
 {
 	std::stringstream ss;
 	ss.str("");
-
+	std::cout << "get :" << _users[0]->get_nickname() << std::endl;
 	if (_users.size() > 0)
 	{
+		std::cout << "users: " << _users.size() << std::endl;
 		for (unsigned int i = 0; i < _users.size(); i++)
+		{
+			std::cout << "index :" << i << "\n" << std::endl;
+			std::cout << "닉네임 : " << _users[i]->get_nickname() << "\n" << std::endl;
 			ss << _users[i]->get_nickname() << " ";
+		}
 	}
 	return ss.str();
 }
@@ -69,6 +89,7 @@ std::string	Room::get_topic() const
 
 std::string	Room::get_name() const
 {
+	std::cout << "user[0] :" << _users[0]->get_nickname() << std::endl;
 	std::cout << "get_name : " << _name << std::endl;
 	return (_name);
 }

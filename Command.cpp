@@ -167,8 +167,9 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 	int i = find_room_idx(params[0]);
 	if (i == -1) // 방이 없을 때
 	{
-		Room room(params[0]);
-		room.add_user(user);
+		Room rom(params[0]);
+		Room &room = rom;
+		room.add_user(&user);
 		_rooms.push_back(room);
 		room.send_all(":" + user.get_nickname() + " JOIN " + room.get_name() + "\n");
 		send_msg(user, RPL_NOTOPIC(user.get_nickname(), room.get_name()));
@@ -181,7 +182,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> params) // o.k
 			return ;
 		if (_rooms[i].get_users().size() > 10)
 			send_err(user, ERR_CHANNELISFULL(user.get_nickname(), _rooms[i].get_name()));
-		_rooms[i].add_user(user);
+		_rooms[i].add_user(&user);
 		_rooms[i].send_all(":" + user.get_nickname() + " JOIN " + _rooms[i].get_name() + "\n");
 		if (_rooms[i].get_topic() == "")
 			send_msg(user, RPL_NOTOPIC(user.get_nickname(), _rooms[i].get_name()));

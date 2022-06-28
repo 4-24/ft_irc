@@ -15,9 +15,13 @@ class	Room
 
 	public:
 		Room(std::string name);
+		Room(const Room& room);
+		Room&	operator=(const Room &room);
 		~Room();
 
-		void				add_user(User &user);
+
+
+		void				add_user(User *user);
 		void				remove_user(std::string name);
 		void				remove_user(User &user);
 		void				send_all(std::string msg);

@@ -14,6 +14,35 @@ User::User(int fd)
 	_realname = "";
 }
 
+User::User(const User& user)
+{
+	_fd = user._fd;
+	_is_registered = user._is_registered;
+	_is_authenticated = user._is_authenticated;
+	_is_admin = user._is_admin;
+	_last_message_time = user._last_message_time;
+	_message_timeout = user._message_timeout;
+	_room_count = user._room_count;
+	_nickname = user._nickname;
+	_username = user._username;
+	_realname = user._realname;
+}
+
+User&	User::operator=(const User &user)
+{
+	_fd = user._fd;
+	_is_registered = user._is_registered;
+	_is_authenticated = user._is_authenticated;
+	_is_admin = user._is_admin;
+	_last_message_time = user._last_message_time;
+	_message_timeout = user._message_timeout;
+	_room_count = user._room_count;
+	_nickname = user._nickname;
+	_username = user._username;
+	_realname = user._realname;
+	return (*this);
+}
+
 User::~User() {}
 
 void	User::add_buffer(std::string message)
