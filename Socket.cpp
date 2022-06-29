@@ -77,12 +77,12 @@ void	Socket::allow()
 }
 
 
-int	Socket::get_connect()
+int	Socket::ft_connect()
 {
 	return (_connect);
 }
 
-int	Socket::get_listen()
+int	Socket::ft_listen()
 {
 	return (_listen);
 }

@@ -35,8 +35,8 @@ class Socket
 		void							create();
 		void							allow();
 
-		int								get_connect();
-		int								get_listen();
+		int								ft_connect();
+		int								ft_listen();
 };
 
 #endif

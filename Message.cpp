@@ -71,8 +71,9 @@ void	Message::parse_params(std::string message, int &i)
 	}
 }
 
-std::string					Message::get_prefix() const { return _prefix; }
+std::string					Message::prefix() const { return _prefix; }
 
-std::string					Message::get_command() const { return _command; }
+std::string					Message::command() const { return _command; }
 
-std::vector<std::string>	Message::get_params() const { return _params; }
+std::vector<std::string>	Message::params() const { return _params; }
+

@@ -24,9 +24,9 @@ class Message
 		void						parse_command(std::string message, int &i);
 		void						parse_params(std::string message, int &i);
 
-		std::string					get_prefix() const;
-		std::string					get_command() const;
-		std::vector<std::string>	get_params() const;
+		std::string					prefix() const;
+		std::string					command() const;
+		std::vector<std::string>	params() const;
 };
 
 #endif

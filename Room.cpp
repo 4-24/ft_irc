@@ -1,130 +1,90 @@
-# include "Room.hpp"
+#include "Room.hpp"
 
-Room::Room (std::string name)
+using std::string;
+using std::set;
+using std::map;
+
+Room::Room() {}
+
+Room::Room(const Room& u)
 {
-	_name = name;
-	_topic = "";
+	*this = u;
 }
 
-Room::Room(const Room& room)
+Room::Room(string name) : _name(name) {}
+
+Room& Room::operator=(const Room& u)
 {
-	_name = room._name;
-	_topic = room._topic;
-	_users = room._users;
+	_name = u._name;
+	_topic = u._topic;
+	_users = u._users;
+	return *this;
 }
 
-Room&	Room::operator=(const Room &room)
+Room::~Room() {}
+
+bool Room::isin(std::string name)
 {
-	_name = room._name;
-	_topic = room._topic;
-	_users = room._users;
-	return (*this);
+	return _users.find(name) != _users.end();
 }
 
-Room::~Room () {}
-
-void	Room::add_user(User *user)
+bool Room::is_operator(std::string name)
 {
-	user->up_room_count();
-	_users.push_back(user);
+	return _operator == name;
 }
 
-void	Room::remove_user(User &user)
+void Room::send_msg(map<string, User> &users, string except_user, string msg)
 {
-	for (unsigned int i = 0; i < _users.size(); i++)
-		if (_users[i] == &user)
-		{
-			_users.erase(_users.begin() + i);
-			break;
-		}
+	for (set<string>::iterator itr = _users.begin(); itr != _users.end(); ++itr)
+		if (*itr != except_user)
+			users[*itr].send_msg(msg);
 }
 
-void	Room::remove_user(std::string name)
+void Room::join(User &u)
 {
-	for (unsigned int i = 0; i < _users.size(); i++)
-		if (_users[i]->get_nickname() == name)
-		{
-			_users[i]->down_room_count();
-			_users.erase(_users.begin() + i);
-			break;
-		}
+	_users.insert(u.nickname());
+	u.rooms().insert(_name);
 }
 
-std::string	Room::get_user_list()
+void Room::part(User& u, map<string, Room>& room)
 {
-	std::stringstream ss;
-	ss.str("");
-	std::cout << "get :" << _users[0]->get_nickname() << std::endl;
-	if (_users.size() > 0)
-	{
-		std::cout << "users: " << _users.size() << std::endl;
-		for (unsigned int i = 0; i < _users.size(); i++)
-		{
-			std::cout << "index :" << i << "\n" << std::endl;
-			std::cout << "닉네임 : " << _users[i]->get_nickname() << "\n" << std::endl;
-			ss << _users[i]->get_nickname() << " ";
-		}
-	}
-	return ss.str();
+	if (!isin(u.nickname()))
+		return ;
+	_users.erase(_users.find(u.nickname()));
+	u.rooms().erase(u.rooms().find(_name));
+	if (_users.size() == 0)
+		room.erase(_name);
 }
 
-void	Room::send_all(std::string msg)
+void Room::set_operator(std::string name)
 {
-	if (_users.size() > 0)
-	{
-		for (unsigned int i = 0; i < _users.size(); i++)
-			send(_users[i]->get_fd(), msg.c_str(), msg.size(), 0);
-	}
+	_operator = name;
 }
 
-void	Room::set_topic(std::string topic)
+void Room::set_topic(std::string topic)
 {
 	_topic = topic;
 }
 
-std::string	Room::get_topic() const
+set<string>& Room::users(void)
+{
+	return _users;
+}
+
+string Room::name(void) const
+{
+	return _name;
+}
+
+string Room::topic(void) const
 {
 	return _topic;
 }
 
-std::string	Room::get_name() const
+string Room::user_list(void) const
 {
-	std::cout << "user[0] :" << _users[0]->get_nickname() << std::endl;
-	std::cout << "get_name : " << _name << std::endl;
-	return (_name);
-}
-
-std::vector<User *>	Room::get_users() const
-{
-	return (_users);
-}
-
-bool Room::is_user(std::string name) const
-{
-	if (_users.size() > 0)
-	{
-		for (unsigned int i = 0; i < _users.size(); i++)
-			if (_users[i]->get_nickname() == name)
-				return true;
-	}
-	return false;
-}
-
-int	Room::get_user_idx(std::string name) const
-{
-	if (_users.size() > 0)
-	{
-		for (unsigned int i = 0; i < _users.size(); i++)
-			if (_users[i]->get_nickname() == name)
-				return i;
-	}
-	return -1;
-}
-
-bool	Room::is_admin(std::string name) const
-{
-	if (_users.size() > 0)
-		if (_users[0]->get_nickname() == name)
-			return true;
-	return false;
+	string ret;
+	for (set<string>::iterator itr = _users.begin(); itr != _users.end(); ++itr)
+		ret += *itr + " ";
+	return ret;
 }

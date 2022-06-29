@@ -12,12 +12,15 @@ Server::Server(int port, std::string password) {
 	_socket = new Socket(port);
 }
 
-Server::~Server() {}
+Server::~Server()
+{
+	delete _socket;
+}
 
 void	Server::start()
 {
 	_socket->create();
-	create_poll(_socket->get_listen(), true);
+	create_poll(_socket->ft_listen(), true);
 
 	while (1)
 	{
@@ -26,17 +29,15 @@ void	Server::start()
 			if (_fds[0].revents & POLLIN) // 서버 소켓에서 POLLIN 이벤트가 발생한 경우
 			{
 				_socket->allow();
-				create_poll(_socket->get_connect(), false);
-				std::cout << "User connected: " << _socket->get_connect() << std::endl;
+				create_poll(_socket->ft_connect(), false);
+				std::cout << "User connected: " << _socket->ft_connect() << std::endl;
 			}
 			for (unsigned int i = 1; i < _fds.size(); i++)
 			{
 				if (_fds[i].revents & POLLIN) // 클라이언트 소켓에서 POLLIN 이벤트가 발생한 경우
 				{
 					int fd = _fds[i].fd;
-					User &user = find_user(fd);
-					chat(user);
-					_fds[i].revents = 0;
+					chat(_users[_nicks[fd]]);
 				}
 			}
 		}
@@ -54,53 +55,22 @@ void	Server::create_poll(int fd, bool is_server)
 
 	if (!is_server)
 	{
-		_users.push_back(User(fd));
+		_nicks[fd] = anonym(fd);
+		User user(fd);
+		_users[anonym(fd)] = user;
 		if (_password != "")
-			send_msg(_users.back(), RPL_NONE((std::string)"Please enter ircserv password."));
+			user.send_msg(RPL_NONE((std::string)"Please enter ircserv password."));
 	}
 }
 
-User &Server::find_user(int fd)
-{
-	for (unsigned int i = 0; i < _users.size(); i++)
-		if (_users[i].get_fd() == fd)
-			return _users[i];
-
-	return _users[0];
-}
-
-int	Server::find_user_idx(int fd)
-{
-	for (unsigned int i = 0; i < _users.size(); i++)
-	{
-		if (_users[i].get_fd() == fd)
-			return i;
-	}
-
-	return -1;
-}
-
-int	Server::find_fd_idx(int fd)
-{
-	for (unsigned int i = 1; i < _fds.size(); i++)
-		if (_fds[i].fd == fd)
-			return i;
-
-	return -1;
-}
-
-std::string	Server::get_wait_list()
+std::string	Server::wait_list()
 {
 	std::stringstream ss;
 	ss.str("");
 
 	if (_users.size() > 0)
 	{
-		for (unsigned int i = 0; i < _users.size(); i++)
-		{
-			if (_users[i].get_room_count() == 0)
-				ss << _users[i].get_nickname() << " ";
-		}
+
 	}
 	return ss.str();
 }
@@ -111,7 +81,7 @@ void	Server::chat(User &user)
 	int			nbytes;
 
 	std::memset(buff, 0, sizeof buff);
-	if ((nbytes = recv(user.get_fd(), buff, sizeof buff, 0)) <= 0 || (nbytes > MSG_LEN))
+	if ((nbytes = recv(user.fd(), buff, sizeof buff, 0)) <= 0 || (nbytes > MSG_LEN))
 	{
 		if (nbytes < 0)
 			throw std::runtime_error("recv: recv error");
@@ -124,40 +94,37 @@ void	Server::chat(User &user)
 	{
 		buff[nbytes] = 0;
 		user.add_buffer(buff);
-		if (user.get_buffer().find_first_of("\n") != std::string::npos)
+		if (user.buffer().find("\r\n") != std::string::npos)
 		{
 			user.setup_message();
-			execute(user, user.get_message());
+			execute(user, user.message());
 			user.clear_message();
 		}
 	}
 
 }
 
-int	Server::find_room_idx(std::string name)
+bool	Server::is_room(std::string name)
 {
-	for (unsigned int i = 0; i < _rooms.size(); i++)
-		if (_rooms[i].get_name() == name)
-			return i;
-
-	return -1;
+	return (_rooms.find(name) != _rooms.end());
 }
 
-int	Server::find_nickname(std::string name)
+bool	Server::is_user(std::string name)
 {
-	for (unsigned int i = 0; i < _users.size(); i++)
-		if (_users[i].get_nickname() == name)
-			return i;
-	return -1;
+	return (_users.find(name) != _users.end());
 }
 
-int	Server::find_username(std::string name)
+bool	Server::is_nick(int i)
 {
-	for (unsigned int i = 0; i < _users.size(); i++)
-		if (_users[i].get_username() == name)
-			return i;
+	return (_nicks.find(i) != _nicks.end());
+}
 
-	return -1;
+std::string Server::anonym(int i)
+{
+	std::stringstream s_fd;
+	s_fd << i;
+	std::string name = "anonym" + s_fd.str();
+	return name;
 }
 
 std::vector<std::string>	Server::split(std::string input, char delimiter) {

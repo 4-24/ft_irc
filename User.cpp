@@ -1,5 +1,7 @@
 # include "User.hpp"
 
+User::User() {}
+
 User::User(int fd)
 {
 	_fd = fd;
@@ -64,16 +66,16 @@ void	User::clear_message()
 
 void	User::setup_message()
 {
-	_buffer.replace(_buffer.find("\n"), 2, "\r\n");
+
 	_message.setup(_buffer);
 
-	std::cout << "prefix: " << _message.get_prefix() << std::endl;
-	std::cout << "command: " << _message.get_command() << std::endl;
-	if (_message.get_params().size() > 0)
+	std::cout << "prefix: " << _message.prefix() << std::endl;
+	std::cout << "command: " << _message.command() << std::endl;
+	if (_message.params().size() > 0)
 	{
 		std::cout << "params: ";
-		for (unsigned int i = 0; i < _message.get_params().size(); i++)
-			std::cout << _message.get_params()[i] << " ";
+		for (unsigned int i = 0; i < _message.params().size(); i++)
+			std::cout << _message.params()[i] << " ";
 		std::cout << std::endl;
 	}
 }
@@ -105,52 +107,52 @@ bool	User::is_admin()
 	return _is_admin;
 }
 
-std::string	User::get_buffer() const
+std::string	User::buffer() const
 {
 	return _buffer;
 }
 
-std::string User::get_nickname() const
+std::string User::nickname() const
 {
 	std::string new_nickname  = _nickname;
 	return new_nickname;
 }
-std::string	User::get_username() const
+std::string	User::username() const
 {
 	return _username;
 }
 
-std::string	User::get_realname() const
+std::string	User::realname() const
 {
 	return _realname;
 }
 
-int	User::get_fd() const
+int	User::fd() const
 {
 	return (_fd);
 }
 
-Message	User::get_message() const
+Message	User::message() const
 {
 	return (_message);
 }
 
-std::string	User::get_prefix() const
+std::string	User::prefix() const
 {
-	return _message.get_prefix();
+	return _message.prefix();
 }
 
-time_t	User::get_last_message_time() const
+time_t	User::last_message_time() const
 {
 	return _last_message_time;
 }
 
-time_t	User::get_message_timeout() const
+time_t	User::message_timeout() const
 {
 	return _message_timeout;
 }
 
-std::string User::prefix() const
+std::string User::fullname() const
 {
 	return std::string(_nickname + "!" + _username + "@" + _realname);
 }
@@ -205,7 +207,22 @@ void	User::set_admin(bool admin)
 	_is_admin = admin;
 }
 
-int	User::get_room_count() const
+int	User::room_count() const
 {
 	return _room_count;
+}
+
+std::set<std::string>& User::rooms(void)
+{
+	return _rooms;
+}
+
+void User::send_msg(std::string msg, int flag)
+{
+	send(_fd, msg.c_str(), msg.size(), flag);
+}
+void	User::send_err(std::string msg, int flag)
+{
+	send(_fd, msg.c_str(), msg.size(), flag);
+	throw std::runtime_error(msg.c_str());
 }

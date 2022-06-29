@@ -1,6 +1,9 @@
 #ifndef USER_HPP
 # define USER_HPP
 
+# include <set>
+# include <iostream>
+# include <sys/socket.h>
 # include "Message.hpp"
 
 class User
@@ -16,11 +19,13 @@ class User
 		std::string	_nickname;
 		std::string	_username;
 		std::string	_realname;
+		std::set<std::string> _rooms;
 
 		time_t		_last_message_time;
 		time_t		_message_timeout;
 
 	public:
+		User();
 		User(int fd);
 		~User();
 		User(const User& user);
@@ -46,18 +51,22 @@ class User
 		void		set_message_timeout(time_t message_timeout);
 		void		set_admin(bool admin);
 
-		std::string	get_buffer() const;
-		int			get_fd() const;
-		int			get_room_count() const;
-		Message		get_message() const;
-		std::string	get_prefix() const;
-		std::string	get_nickname() const;
-		std::string	get_username() const;
-		std::string	get_realname() const;
-		time_t		get_last_message_time() const;
-		time_t		get_message_timeout() const;
-		bool		is_admin() const;
+		std::string	buffer() const;
+		int			fd() const;
+		int			room_count() const;
+		Message		message() const;
 		std::string	prefix() const;
+		std::string	nickname() const;
+		std::string	username() const;
+		std::string	realname() const;
+		std::string	fullname() const;
+		time_t		last_message_time() const;
+		time_t		message_timeout() const;
+		bool		is_admin() const;
+
+		std::set<std::string>& rooms(void);
+		void	send_msg(std::string msg, int flag=0);
+		void	send_err(std::string msg, int flag=0);
 };
 
 #endif

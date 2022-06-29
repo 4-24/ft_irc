@@ -2,7 +2,7 @@ NAME = ircserv
 
 CPP = c++ #-g
 
-CPPFLAGS = -std=c++98 -Wall -Wextra -Werror
+CPPFLAGS = -std=c++98 -Wall -Wextra -Werror -g3 -fsanitize=address
 
 SRC_NAME =	main.cpp \
 			Server.cpp \

@@ -1,39 +1,39 @@
-#ifndef ROOM_HPP
-# define ROOM_HPP
+#ifndef CHANNEL_HPP
+# define CHANNEL_HPP
 
 # include <string>
-# include <sstream>
-# include <sys/socket.h>
-#include "User.hpp"
+# include <set>
+# include <map>
 
-class	Room
+# include "User.hpp"
+
+class Room
 {
-	private:
-		std::string			_name;
-		std::string 		_topic;
-		std::vector<User *>	_users;
+private:
+	std::string _name;
+	std::string _topic;
+	std::set<std::string> _users;
+	std::string	_operator;
 
-	public:
-		Room(std::string name);
-		Room(const Room& room);
-		Room&	operator=(const Room &room);
-		~Room();
+public:
+	Room();
+	Room(const Room& u);
+	Room(std::string name);
+	Room& operator=(const Room& u);
+	~Room();
 
-
-
-		void				add_user(User *user);
-		void				remove_user(std::string name);
-		void				remove_user(User &user);
-		void				send_all(std::string msg);
-		void				set_topic(std::string topic);
-
-		std::string			get_name() const;
-		std::string			get_topic() const;
-		std::vector<User *>	get_users() const;
-		int					get_user_idx(std::string name) const;
-		std::string			get_user_list();
-		bool				is_user(std::string name) const;
-		bool				is_admin(std::string name) const;
+	bool isin(std::string name);
+	bool is_user(std::string name);
+	bool is_operator(std::string name);
+	void send_msg(std::map<std::string, User> &user, std::string except_user, std::string msg);
+	void join(User &u);
+	void part(User &u, std::map<std::string, Room>& room);
+	void set_operator(std::string name);
+	void set_topic(std::string topic);
+	std::set<std::string>& users(void);
+	std::string	name(void) const;
+	std::string	topic(void) const;
+	std::string	user_list(void) const;
 };
 
 #endif

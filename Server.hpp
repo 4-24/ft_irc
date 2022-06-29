@@ -31,15 +31,15 @@
 # define SUPER_PASS "424"
 # define SERV "ircserv"
 
-
 class Server
 {
 	private:
 		int								_port;
 		int								server_socket;
 		std::string						_password;
-		std::vector<User>				_users;
-		std::vector<Room>				_rooms;
+		std::map<std::string, User>		_users;
+		std::map<int, std::string>		_nicks;
+		std::map<std::string, Room>		_rooms;
 		Socket							*_socket;
 		std::vector<struct pollfd>		_fds;
 
@@ -49,46 +49,38 @@ class Server
 		~Server();
 		void							start();
 		void							create_poll(int fd, bool is_server);
-		User							&find_user(int fd);
-		int								find_user_idx(int fd);
-		int								find_fd_idx(int fd);
-		int								find_nickname(std::string name);
-		int								find_username(std::string name);
 		void							chat(User &user);
 		void							execute(User &user, Message message);
-		int								find_room_idx(std::string room_name);
+		bool							is_room(std::string name);
+		bool							is_user(std::string name);
+		bool							is_nick(int i);
 		bool							is_flooding(User &user);
-		std::string						get_wait_list();
+		bool							is_user_fd(int i);
+		std::string						wait_list();
 		bool							is_valid_room_name(const std::string &name);
 		std::vector<std::string>		split(std::string input, char delimiter);
+		std::string						anonym(int i);
 
-		void	cmd_pass(User &user, std::vector<std::string> params);
-		void	cmd_nick(User &user, std::string param);
-		void	cmd_user(User &user, std::vector<std::string> params);
-		void	cmd_oper(User &user, std::vector<std::string> params);
-		void	cmd_mode(User &user, std::vector<std::string> params);
-		void	cmd_join(User &user, std::vector<std::string> params);
-		void	cmd_kick(User &user, std::vector<std::string> params);
-		void	cmd_part(User &user, std::string param);
-		void	cmd_privmsg(User &user, std::vector<std::string> params);
-		void	cmd_notice(User &user, std::vector<std::string> params);
-		void	cmd_names(User &user, std::vector<std::string> params);
-		void	cmd_list(User &user, std::vector<std::string> params);
-		void	cmd_topic(User &user, std::vector<std::string> params);
+		void	cmd_pass(User &user, std::vector<std::string> &params);
+		void	cmd_nick(User &user, std::vector<std::string> &params);
+		void	cmd_user(User &user, std::vector<std::string> &params);
+		void	cmd_oper(User &user, std::vector<std::string> &params);
+		void	cmd_mode(User &user, std::vector<std::string> &params);
+		void	cmd_join(User &user, std::vector<std::string> &params);
+		void	cmd_kick(User &user, std::vector<std::string> &params);
+		void	cmd_part(User &user, std::vector<std::string> &params);
+		void	cmd_privmsg(User &user, std::vector<std::string> &params);
+		void	cmd_notice(User &user, std::vector<std::string> &params);
+		void	cmd_names(User &user, std::vector<std::string> &params);
+		void	cmd_list(User &user, std::vector<std::string> &params);
+		void	cmd_topic(User &user, std::vector<std::string> &params);
 
 		void	quit(User &user);
 		void	cmd_ping(User &user, const Message &msg);
 		void	cmd_pong(User &user, const Message &msg);
 
-		void							send_msg(User user, std::string message);
-		void							send_err(User user, std::string message);
 		void							send_motd(User user);
-		void							send_privmsg_to_room(User &from, int idx, std::string message);
-		void							send_notice_to_room(User &from, int idx, std::string message);
-		void							send_privmsg(User &to, User &from, std::string msg);
-		void							send_notice(User &to, User &from, std::string msg);
 		void							send_pong(User &user, std::string msg);
 };
 
 #endif
-
