@@ -86,14 +86,10 @@ void	Server::cmd_nick(User &user, std::vector<std::string> &params)
 		user.send_err(ERR_NICKCOLLISION(params[0]));
 	else // 정상적인 닉네임
 	{
-		_users[params[0]] = user; // 복사 생성
+		_users[params[0]] = user;
 		_users[params[0]].set_nickname(params[0]);
-		_users.erase(user.nickname()); // 지워주기
-		_nicks[user.fd()] = params[0]; // 바꿔주기
-
-		user.send_msg("닉네임 설정 완료\n");
-		std::cout<< "닉네임 설정 완료\n";
-		std::cout << "닉네임 : " << _users[params[0]].nickname() << std::endl;
+		_users.erase(user.nickname());
+		_nicks[user.fd()] = params[0];
 		if (_users[params[0]].nickname().size() > 0 && _users[params[0]].username().size() > 0)
 		{
 			_users[params[0]].set_registered(true);
@@ -114,10 +110,6 @@ void	Server::cmd_user(User &user, std::vector<std::string> &params)
 		{
 			user.set_username(params[0]);
 			user.set_realname(params[3]);
-			user.send_msg("이름 설정 완료\n");
-			std::cout<< "이름 설정 완료\n";
-			std::cout << "nickname: " << user.nickname() << std::endl;
-			std::cout << "username: " << user.username() << std::endl;
 		}
 		else
 		{
