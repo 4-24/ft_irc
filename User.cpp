@@ -10,7 +10,6 @@ User::User(int fd)
 	_is_admin = false;
 	_last_message_time = time(NULL);
 	_message_timeout = 1;
-	_room_count = 0;
 	_nickname = "";
 	_username = "";
 	_realname = "";
@@ -24,7 +23,6 @@ User::User(const User& user)
 	_is_admin = user._is_admin;
 	_last_message_time = user._last_message_time;
 	_message_timeout = user._message_timeout;
-	_room_count = user._room_count;
 	_nickname = user._nickname;
 	_username = user._username;
 	_realname = user._realname;
@@ -38,7 +36,6 @@ User&	User::operator=(const User &user)
 	_is_admin = user._is_admin;
 	_last_message_time = user._last_message_time;
 	_message_timeout = user._message_timeout;
-	_room_count = user._room_count;
 	_nickname = user._nickname;
 	_username = user._username;
 	_realname = user._realname;
@@ -82,18 +79,6 @@ void	User::setup_message()
 			std::cout << _message.params()[i] << " ";
 		std::cout << std::endl;
 	}
-}
-
-void	User::up_room_count()
-{
-	if (_room_count >= 0)
-		_room_count++;
-}
-
-void	User::down_room_count()
-{
-	if (_room_count >= 0)
-		_room_count--;
 }
 
 bool	User::is_registered()
@@ -209,11 +194,6 @@ void	User::set_message_timeout(time_t message_timeout)
 void	User::set_admin(bool admin)
 {
 	_is_admin = admin;
-}
-
-int	User::room_count() const
-{
-	return _room_count;
 }
 
 std::set<std::string>& User::rooms(void)
