@@ -8,6 +8,7 @@
 # include <poll.h>
 # include <arpa/inet.h>
 # include <string>
+# include <stdlib.h>
 # include <iostream>
 # include <sstream>
 # include <exception>
