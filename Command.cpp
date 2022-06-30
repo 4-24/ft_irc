@@ -101,7 +101,7 @@ void	Server::cmd_nick(User &user, std::vector<std::string> &params)
 		std::cout << "username: " << _users[params[0]].username() << std::endl;
 		if (_users[params[0]].nickname().size() > 0 && _users[params[0]].username().size() > 0)
 		{
-			user.set_registered(true);
+			_users[params[0]].set_registered(true);
 			send_motd(user);
 		}
 	}
@@ -130,7 +130,7 @@ void	Server::cmd_user(User &user, std::vector<std::string> &params)
 		}
 		if (user.nickname().size() > 0 && user.username().size() > 0)
 		{
-			user.set_registered(true);
+			_users[params[0]].set_registered(true);
 			send_motd(user);
 		}
 	}

@@ -70,7 +70,11 @@ std::string	Server::wait_list()
 
 	if (_users.size() > 0)
 	{
-
+		for (std::map<std::string, User>::iterator itr = _users.begin(); itr != _users.end(); ++itr)
+		{
+			if (_users[itr->first].rooms().size() == 0)
+				ss << _users[itr->first].nickname() + " ";
+		}
 	}
 	return ss.str();
 }
