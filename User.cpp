@@ -58,20 +58,14 @@ void	User::add_buffer(std::string message)
 void	User::clear_message()
 {
 	_message = Message();
-	size_t pos = _buffer.find_first_of("\r\n");
-	std::cout << "pos: " << pos << std::endl;
-	std::cout << "before buffer: " << _buffer << std::endl;
-	if (_buffer.back() != '\0' && pos != std::string::npos) // pos랑 buffer size같은지 확인해야함 만약 buffer size보다 작으면 실행
-		_buffer = _buffer.substr(pos + 2);
-	std::cout << "after buffer: " << _buffer << std::endl;
 }
 
 void	User::setup_message()
 {
 	_message.setup(_buffer);
-
-	std::cout << "prefix: " << _message.prefix() << std::endl;
-	std::cout << "command: " << _message.command() << std::endl;
+	size_t pos = _buffer.find_first_of("\r\n");
+	if (_buffer.back() != '\0' && pos != std::string::npos)
+		_buffer = _buffer.substr(pos + 2);
 	if (_message.params().size() > 0)
 	{
 		std::cout << "params: ";
