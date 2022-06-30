@@ -82,18 +82,18 @@ void	Server::cmd_nick(User &user, std::vector<std::string> &params)
 		user.send_err(ERR_ERRONEUSNICKNAME(params[0]));
 	else if (is_user(params[0])) // 이미 존재하는 닉네임
 		user.send_err(ERR_NICKNAMEINUSE(params[0]));
-	else if (is_user(params[0]) && _users[params[0]].is_registered())
-		user.send_err(ERR_NICKCOLLISION(params[0]));
+	else if (user.is_registered())
+		user.send_err(ERR_ALREADYREGISTRED(user.nickname()));
 	else // 정상적인 닉네임
 	{
 		_users[params[0]] = user;
 		_users[params[0]].set_nickname(params[0]);
 		_users.erase(user.nickname());
-		_nicks[user.fd()] = params[0];
+		_nicks[_users[params[0]].fd()] = params[0];
 		if (_users[params[0]].nickname().size() > 0 && _users[params[0]].username().size() > 0)
 		{
 			_users[params[0]].set_registered(true);
-			send_motd(user);
+			send_motd(_users[params[0]]);
 		}
 	}
 }
