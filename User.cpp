@@ -68,11 +68,11 @@ void	User::setup_message()
 {
 	_message.setup(_buffer);
 	size_t pos = _buffer.find_first_of("\r\n");
-	if (pos != std::string::npos)
+	if (!_buffer.empty() && pos != std::string::npos)
 		_buffer = _buffer.substr(pos + 2);
-	else
+	else if (!_buffer.empty())
 		_buffer.clear();
-	if (_message.params().size() > 0)
+	if (!_message.params().empty())
 	{
 		std::cout << "params: ";
 		for (unsigned int i = 0; i < _message.params().size(); i++)
