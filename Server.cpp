@@ -100,9 +100,12 @@ void	Server::chat(int fd)
 		_users[_nicks[fd]].add_buffer(buff);
 		while (_users[_nicks[fd]].buffer().find_first_of("\r\n") != std::string::npos)
 		{
-			_users[_nicks[fd]].setup_message();
-			execute(_users[_nicks[fd]], _users[_nicks[fd]].message());
-			_users[_nicks[fd]].clear_message();
+			while (_users[_nicks[fd]].buffer().size() > 0)
+			{
+				_users[_nicks[fd]].setup_message();
+				execute(_users[_nicks[fd]], _users[_nicks[fd]].message());
+				_users[_nicks[fd]].clear_message();
+			}
 		}
 	}
 

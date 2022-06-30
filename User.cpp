@@ -26,6 +26,8 @@ User::User(const User& user)
 	_nickname = user._nickname;
 	_username = user._username;
 	_realname = user._realname;
+	_message = user._message;
+	_buffer = user._buffer;
 }
 
 User&	User::operator=(const User &user)
@@ -39,6 +41,8 @@ User&	User::operator=(const User &user)
 	_nickname = user._nickname;
 	_username = user._username;
 	_realname = user._realname;
+	_message = user._message;
+	_buffer = user._buffer;
 	return (*this);
 }
 
@@ -64,8 +68,10 @@ void	User::setup_message()
 {
 	_message.setup(_buffer);
 	size_t pos = _buffer.find_first_of("\r\n");
-	if (_buffer.back() != '\0' && pos != std::string::npos)
+	if (pos != std::string::npos)
 		_buffer = _buffer.substr(pos + 2);
+	else
+		_buffer.clear();
 	if (_message.params().size() > 0)
 	{
 		std::cout << "params: ";

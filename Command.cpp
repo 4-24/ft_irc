@@ -125,7 +125,7 @@ void	Server::cmd_user(User &user, std::vector<std::string> &params)
 		}
 		if (user.nickname().size() > 0 && user.username().size() > 0)
 		{
-			_users[params[0]].set_registered(true);
+			user.set_registered(true);
 			send_motd(user);
 		}
 	}
