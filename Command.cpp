@@ -363,6 +363,15 @@ void	Server::quit(User &user)
 	user.send_msg(RPL_NONE((std::string)"Goodbye!"));
 	close(user.fd());
 	std::cout << "User " << user.fd() << " disconnected." << std::endl;
+
+	for (std::vector<struct pollfd>::iterator it = _fds.begin(); it != _fds.end(); it++)
+		if (it->fd == user.fd())
+		{
+			_fds.erase(it);
+			break ;
+		}
+	_nicks.erase(user.fd());
+	_users.erase(user.nickname());
 }
 
 bool	Server::is_flooding(User &user)

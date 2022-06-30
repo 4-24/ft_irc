@@ -108,7 +108,6 @@ void	Server::chat(int fd)
 			}
 		}
 	}
-
 }
 
 bool	Server::is_room(std::string name)
