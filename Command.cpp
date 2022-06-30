@@ -87,18 +87,13 @@ void	Server::cmd_nick(User &user, std::vector<std::string> &params)
 	else // 정상적인 닉네임
 	{
 		_users[params[0]] = user; // 복사 생성
-		std::cout << "test1: " << _users[params[0]].nickname() << std::endl;
-
 		_users[params[0]].set_nickname(params[0]);
-		std::cout << "test2: " << _users[params[0]].nickname() << std::endl;
 		_users.erase(user.nickname()); // 지워주기
-		std::cout << "test3: " << _users[params[0]].nickname() << std::endl;
 		_nicks[user.fd()] = params[0]; // 바꿔주기
-		std::cout << "test4: " << _users[params[0]].nickname() << std::endl;
+
 		user.send_msg("닉네임 설정 완료\n");
 		std::cout<< "닉네임 설정 완료\n";
-		std::cout << "nickname: " << _users[params[0]].nickname() << std::endl;
-		std::cout << "username: " << _users[params[0]].username() << std::endl;
+		std::cout << "닉네임 : " << _users[params[0]].nickname() << std::endl;
 		if (_users[params[0]].nickname().size() > 0 && _users[params[0]].username().size() > 0)
 		{
 			user.set_registered(true);
@@ -180,7 +175,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> &params) // o.k
 		_rooms[params[0]] = Room(params[0]);
 		_rooms[params[0]].set_operator(user.nickname());
 		_rooms[params[0]].join(user);
-		_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " JOIN " + _rooms[params[0]].name() + "\n");
+		_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " JOIN " + _rooms[params[0]].name() + "\n", true);
 		user.send_msg(RPL_NOTOPIC(user.nickname(), _rooms[params[0]].name()));
 		user.send_msg(RPL_NAMREPLY(user.nickname(), _rooms[params[0]].name(), _rooms[params[0]].user_list()));
 		user.send_msg(RPL_ENDOFNAMES(user.nickname(), _rooms[params[0]].name()));
@@ -368,15 +363,6 @@ void	Server::quit(User &user)
 	user.send_msg(RPL_NONE((std::string)"Goodbye!"));
 	close(user.fd());
 	std::cout << "User " << user.fd() << " disconnected." << std::endl;
-
-	for (std::vector<struct pollfd>::iterator it = _fds.begin(); it != _fds.end(); it++)
-		if (it->fd == user.fd())
-		{
-			_fds.erase(it);
-			break ;
-		}
-	_nicks.erase(user.fd());
-	_users.erase(user.nickname());
 }
 
 bool	Server::is_flooding(User &user)

@@ -37,7 +37,7 @@ void	Server::start()
 				if (_fds[i].revents & POLLIN) // 클라이언트 소켓에서 POLLIN 이벤트가 발생한 경우
 				{
 					int fd = _fds[i].fd;
-					chat(_users[_nicks[fd]]);
+					chat(fd);
 				}
 			}
 		}
@@ -75,30 +75,31 @@ std::string	Server::wait_list()
 	return ss.str();
 }
 
-void	Server::chat(User &user)
+void	Server::chat(int fd)
 {
 	char		buff[MSG_LEN];
 	int			nbytes;
 
 	std::memset(buff, 0, sizeof buff);
-	if ((nbytes = recv(user.fd(), buff, sizeof buff, 0)) <= 0 || (nbytes > MSG_LEN))
+	if ((nbytes = recv(_users[_nicks[fd]].fd(), buff, sizeof buff, 0)) <= 0 || (nbytes > MSG_LEN))
 	{
 		if (nbytes < 0)
 			throw std::runtime_error("recv: recv error");
 		else if (nbytes > MSG_LEN)
 			throw std::runtime_error("recv: message too long");
 		else if (nbytes == 0)
-			quit(user);
+			quit(_users[_nicks[fd]]);
 	}
 	else
 	{
 		buff[nbytes] = 0;
-		user.add_buffer(buff);
-		if (user.buffer().find("\r\n") != std::string::npos)
+		_users[_nicks[fd]].add_buffer(buff);
+		while (_users[_nicks[fd]].buffer().find("\r\n") != std::string::npos)
 		{
-			user.setup_message();
-			execute(user, user.message());
-			user.clear_message();
+			_users[_nicks[fd]].setup_message();
+			execute(_users[_nicks[fd]], _users[_nicks[fd]].message());
+			_users[_nicks[fd]].clear_message();
+			std::cout << "Message: " << _users[_nicks[fd]].buffer() << std::endl;
 		}
 	}
 

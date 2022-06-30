@@ -33,10 +33,10 @@ bool Room::is_operator(std::string name)
 	return _operator == name;
 }
 
-void Room::send_msg(map<string, User> &users, string except_user, string msg)
+void Room::send_msg(map<string, User> &users, string except_user, string msg, bool is_all)
 {
 	for (set<string>::iterator itr = _users.begin(); itr != _users.end(); ++itr)
-		if (*itr != except_user)
+		if (!is_all && *itr != except_user)
 			users[*itr].send_msg(msg);
 }
 

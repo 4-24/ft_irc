@@ -49,7 +49,7 @@ class Server
 		~Server();
 		void							start();
 		void							create_poll(int fd, bool is_server);
-		void							chat(User &user);
+		void							chat(int fd);
 		void							execute(User &user, Message message);
 		bool							is_room(std::string name);
 		bool							is_user(std::string name);

@@ -10,7 +10,6 @@ class Message
 	private:
 		std::string					_prefix;
 		std::string					_command;
-		std::string					_msg;
 		std::vector<std::string>	_params;
 
 	public:

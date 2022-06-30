@@ -25,7 +25,7 @@ public:
 	bool isin(std::string name);
 	bool is_user(std::string name);
 	bool is_operator(std::string name);
-	void send_msg(std::map<std::string, User> &user, std::string except_user, std::string msg);
+	void send_msg(std::map<std::string, User> &user, std::string except_user, std::string msg, bool is_all=false);
 	void join(User &u);
 	void part(User &u, std::map<std::string, Room>& room);
 	void set_operator(std::string name);
