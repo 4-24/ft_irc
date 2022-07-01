@@ -55,6 +55,8 @@ void	Server::execute(User &user, Message message)
 
 void	Server::cmd_pass(User &user, std::vector<std::string> &params) // o.k
 {
+	if (params.size() != 1)
+		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "pass"));
 	if (user.is_authenticated())
 		user.send_err(ERR_ALREADYREGISTRED(user.nickname()));
 	if (params.size() == 1)
