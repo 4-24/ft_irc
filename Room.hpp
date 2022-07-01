@@ -27,7 +27,7 @@ public:
 	bool is_operator(std::string name);
 	void send_msg(std::map<std::string, User> &user, std::string except_user, std::string msg);
 	void join(User &u);
-	void part(User &u, std::map<std::string, Room>& room);
+	void part(User &u);
 	void set_operator(std::string name);
 	void set_topic(std::string topic);
 	void send_msg(std::map<std::string, User> &users, std::string msg);

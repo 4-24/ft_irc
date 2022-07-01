@@ -236,7 +236,11 @@ void	Server::cmd_kick(User &user, std::vector<std::string> &params) // o.k
 		user.send_err(ERR_NOSUCHNICK(user.nickname()));
 
 	_rooms[params[0]].send_msg(_users, user.fullname() + " KICK " + params[0] + " " + params[1] + "\n");
-	_rooms[params[0]].part(_users[params[1]], _rooms);
+	_rooms[params[0]].part(_users[params[1]]);
+	if (_rooms[params[0]].users().size() == 0)
+		_rooms.erase(params[0]);
+	else
+		_rooms[params[0]].set_operator(*(_rooms[params[0]].users().begin()));
 }
 
 void	Server::cmd_part(User &user, std::vector<std::string> &params) // o.k
@@ -249,8 +253,10 @@ void	Server::cmd_part(User &user, std::vector<std::string> &params) // o.k
 		user.send_err(ERR_NOTONCHANNEL(user.nickname(), params[0]));
 
 	_rooms[params[0]].send_msg(_users, user.fullname() + " PART " + _rooms[params[0]].name() + "\n");
-	_rooms[params[0]].part(user, _rooms);
-	if (_rooms[params[0]].users().size() > 0)
+	_rooms[params[0]].part(user);
+	if (_rooms[params[0]].users().size() == 0)
+		_rooms.erase(params[0]);
+	else
 		_rooms[params[0]].set_operator(*(_rooms[params[0]].users().begin()));
 }
 
@@ -354,7 +360,15 @@ void	Server::cmd_topic(User &user, std::vector<std::string> &params)
 void	Server::quit(User &user)
 {
 	while (!user.rooms().empty())
-		_rooms[*user.rooms().begin()].part(user, _rooms);
+	{
+		std::string name = *user.rooms().begin();
+		_rooms[name].part(user);
+		if (_rooms[name].users().size() == 0)
+			_rooms.erase(name);
+		else
+			_rooms[name].set_operator(*(_rooms[name].users().begin()));
+	}
+
 
 	user.send_msg(RPL_NONE((std::string)"Goodbye!"));
 	close(user.fd());

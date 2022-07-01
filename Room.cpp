@@ -52,14 +52,12 @@ void Room::join(User &u)
 	u.rooms().insert(_name);
 }
 
-void Room::part(User& u, map<string, Room>& room)
+void Room::part(User& u)
 {
 	if (!isin(u.nickname()))
 		return ;
 	_users.erase(_users.find(u.nickname()));
 	u.rooms().erase(u.rooms().find(_name));
-	if (_users.size() == 0)
-		room.erase(_name);
 }
 
 void Room::set_operator(std::string name)
