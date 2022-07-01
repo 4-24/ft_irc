@@ -234,7 +234,7 @@ void	Server::cmd_kick(User &user, std::vector<std::string> &params) // o.k
 		user.send_err(ERR_NOSUCHNICK(user.nickname()));
 
 	_rooms[params[0]].send_msg(_users, user.fullname() + " KICK " + params[0] + " " + params[1] + "\n");
-	_rooms[params[0]].part(user, _rooms);
+	_rooms[params[0]].part(_users[params[1]], _rooms);
 }
 
 void	Server::cmd_part(User &user, std::vector<std::string> &params) // o.k
