@@ -72,7 +72,7 @@ void	Server::cmd_pass(User &user, std::vector<std::string> &params) // o.k
 }
 
 bool check_nick(std::string const &str) {
- 	return (str.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") ==
+	return (str.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") ==
 		std::string::npos) && (str.size() > 0 && str.size() < 9);
 }
 
@@ -127,35 +127,34 @@ void	Server::cmd_user(User &user, std::vector<std::string> &params)
 
 void	Server::cmd_oper(User &user, std::vector<std::string> &params)
 {
- 	if (params.size() != 2)
- 		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "OPER"));
- 	if (params[0] != SUPER_NICK)
- 		user.send_err(ERR_ERRONEUSNICKNAME(user.nickname()));
- 	if (params[1] != SUPER_PASS)
- 		user.send_err(ERR_PASSWDMISMATCH(user.nickname()));
- 	_users[params[0]].set_admin(true);
- 	user.send_msg(RPL_YOUREOPER(user.nickname()));
+	if (params.size() != 2)
+		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "OPER"));
+	if (params[0] != SUPER_NICK)
+		user.send_err(ERR_ERRONEUSNICKNAME(user.nickname()));
+	if (params[1] != SUPER_PASS)
+		user.send_err(ERR_PASSWDMISMATCH(user.nickname()));
+	user.set_admin(true);
+	user.send_msg(RPL_YOUREOPER(user.nickname()));
 }
-
 void	Server::cmd_mode(User &user, std::vector<std::string> &params)
 {
 	if (params.size() >= 1 && params[0][0] == '#')
 		return ;
- 	if (params.size() >= 2 && (params[0].empty() || params[1].empty()))
- 		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "MODE"));
- 	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
- 	{
- 		if (is_user(params[1]))
- 			user.send_err(ERR_NOSUCHNICK(user.nickname()));
-		if (!_users[params[1]].is_admin())
- 			user.send_err(ERR_NOPRIVILEGES(user.nickname()));
- 		if (params[0][0] == '+')
- 			_users[params[1]].set_admin(true);
- 		else
- 			_users[params[1]].set_admin(false);
- 	}
- 	else
- 		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "MODE"));
+	if (params.size() >= 2 && (params[0].empty() || params[1].empty()))
+		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "MODE"));
+	if ((params[0][0] == '+' || params[0][0] == '-' ) && params[0][1] == 'o' && params[0].size() == 2)
+	{
+		if (!is_user(params[1]))
+			user.send_err(ERR_NOSUCHNICK(user.nickname()));
+		if (!user.is_admin())
+			user.send_err(ERR_NOPRIVILEGES(user.nickname()));
+		if (params[0][0] == '+')
+			_users[params[1]].set_admin(true);
+		else
+			_users[params[1]].set_admin(false);
+	}
+	else
+		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "MODE"));
 }
 
 void	Server::cmd_join(User &user, std::vector<std::string> &params) // o.k
@@ -223,8 +222,8 @@ void	Server::cmd_list(User &user, std::vector<std::string> &params)
 
 void	Server::cmd_kick(User &user, std::vector<std::string> &params) // o.k
 {
- 	if (params.size() < 2)
- 		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "KICK"));
+	if (params.size() < 2)
+		user.send_err(ERR_NEEDMOREPARAMS(user.nickname(), "KICK"));
 
 	if (!is_room(params[0]))
 		user.send_err(ERR_NOSUCHCHANNEL(user.nickname(), params[0]));
