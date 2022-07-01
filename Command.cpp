@@ -55,6 +55,8 @@ void	Server::execute(User &user, Message message)
 
 void	Server::cmd_pass(User &user, std::vector<std::string> &params) // o.k
 {
+	if (user.is_authenticated())
+		user.send_err(ERR_ALREADYREGISTRED(user.nickname()));
 	if (params.size() == 1)
 	{
 		if (params[0] == _password)
@@ -65,8 +67,6 @@ void	Server::cmd_pass(User &user, std::vector<std::string> &params) // o.k
 		else
 			user.send_err(ERR_PASSWDMISMATCH(user.nickname()));
 	}
-	else if (user.is_authenticated())
-		user.send_err(ERR_ALREADYREGISTRED(user.nickname()));
 }
 
 bool check_nick(std::string const &str) {
@@ -233,7 +233,7 @@ void	Server::cmd_kick(User &user, std::vector<std::string> &params) // o.k
 	if (_rooms[params[0]].isin(params[1]) == false)
 		user.send_err(ERR_NOSUCHNICK(user.nickname()));
 
-	_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " KICK " + params[0] + " " + params[1] + "\n");
+	_rooms[params[0]].send_msg(_users, user.fullname() + " KICK " + params[0] + " " + params[1] + "\n");
 	_rooms[params[0]].part(user, _rooms);
 }
 
@@ -261,14 +261,14 @@ void	Server::cmd_privmsg(User &user, std::vector<std::string> &params) // o.k
 	{
 		if (!is_room(params[0]))
 			user.send_err(ERR_NOTONCHANNEL(user.nickname(), params[0]));
-		_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " PRIVMSG " + params[0] + " :" + params[1] + "\n");
+		_rooms[params[0]].send_msg(_users, user.nickname(), user.fullname() + " PRIVMSG " + params[0] + " :" + params[1] + "\n");
 
 	}
 	else // 유저에게 메시지를 보낼 때
 	{
 		if (!is_user(params[0]))
 			user.send_err(ERR_NOSUCHNICK(user.nickname()));
-		_users[params[0]].send_msg(":" + user.nickname() + " PRIVMSG " + params[0] + " :" + params[1] + "\n");
+		_users[params[0]].send_msg(user.fullname() + " PRIVMSG " + params[0] + " :" + params[1] + "\n");
 	}
 }
 
@@ -283,14 +283,14 @@ void	Server::cmd_notice(User &user, std::vector<std::string> &params) // o.k
 	{
 		if (!is_room(params[0]))
 			return ;
-		_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " NOTICE " + params[0] + " :" + params[1] + "\n");
+		_rooms[params[0]].send_msg(_users, user.fullname() + user.nickname() + " NOTICE " + params[0] + " :" + params[1] + "\n");
 
 	}
 	else // 유저에게 메시지를 보낼 때
 	{
 		if (!is_user(params[0]))
 			return ;
-		_users[params[0]].send_msg(":" + user.nickname() + " NOTICE " + params[0] + " :" + params[1] + "\n");
+		_users[params[0]].send_msg(user.fullname() + " NOTICE " + params[0] + " :" + params[1] + "\n");
 	}
 }
 
