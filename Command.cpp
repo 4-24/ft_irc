@@ -248,6 +248,8 @@ void	Server::cmd_part(User &user, std::vector<std::string> &params) // o.k
 
 	_rooms[params[0]].send_msg(_users, user.fullname() + " PART " + _rooms[params[0]].name() + "\n");
 	_rooms[params[0]].part(user, _rooms);
+	if (_rooms[params[0]].users().size() > 0)
+		_rooms[params[0]].set_operator(*(_rooms[params[0]].users().begin()));
 }
 
 void	Server::cmd_privmsg(User &user, std::vector<std::string> &params) // o.k
