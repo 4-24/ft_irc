@@ -411,7 +411,7 @@ void	Server::cmd_pong(User &user, const Message &msg)
 
 bool	Server::is_valid_room_name(const std::string &name)
 {
-	if (name.length() < 2 || name.length() > 50 || name.find_first_of("&#+!") != 0)
+	if (name.length() < 2 || name.length() > 50 || name.find_first_of("&@#+!") != 0)
 		return false;
 	for (unsigned int i = 0; i < name.length(); i++) {
 		if (isspace(name[i]) || iscntrl(name[i]) || name[i] == ',')
