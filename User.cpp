@@ -68,8 +68,8 @@ void	User::setup_message()
 {
 	_message.setup(_buffer);
 	size_t pos = _buffer.find_first_of("\r\n");
-	if (!_buffer.empty() && pos != std::string::npos)
-		_buffer = _buffer.substr(pos + 2);
+	if (pos != std::string::npos && _buffer[pos + 2] != '\0')
+			_buffer = _buffer.substr(pos + 2);
 	else if (!_buffer.empty())
 		_buffer.clear();
 	if (!_message.params().empty())
@@ -143,7 +143,7 @@ time_t	User::message_timeout() const
 
 std::string User::fullname() const
 {
-	return std::string(_nickname + "!" + _username + "@" + _realname);
+	return std::string(":" + _nickname + "!" + _username + "@" + _realname);
 }
 
 bool	User::is_admin() const

@@ -167,7 +167,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> &params) // o.k
 		_rooms[params[0]] = Room(params[0]);
 		_rooms[params[0]].set_operator(user.nickname());
 		_rooms[params[0]].join(user);
-		_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " JOIN " + _rooms[params[0]].name() + "\n", true);
+		user.send_msg(user.fullname() + " JOIN " + params[0] + "\n");
 		user.send_msg(RPL_NOTOPIC(user.nickname(), _rooms[params[0]].name()));
 		user.send_msg(RPL_NAMREPLY(user.nickname(), _rooms[params[0]].name(), _rooms[params[0]].user_list()));
 		user.send_msg(RPL_ENDOFNAMES(user.nickname(), _rooms[params[0]].name()));
@@ -177,7 +177,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> &params) // o.k
 		if (_rooms[params[0]].users().size() > 10)
 			user.send_err(ERR_CHANNELISFULL(user.nickname(), _rooms[params[0]].name()));
 		_rooms[params[0]].join(user);
-		_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " JOIN " + _rooms[params[0]].name() + "\n");
+		_rooms[params[0]].send_msg(_users, user.nickname(), user.fullname() + " JOIN " + params[0] + "\n", true);
 		if (_rooms[params[0]].topic() == "")
 			user.send_msg(RPL_NOTOPIC(user.nickname(), _rooms[params[0]].name()));
 		else
