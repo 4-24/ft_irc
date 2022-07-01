@@ -246,7 +246,7 @@ void	Server::cmd_part(User &user, std::vector<std::string> &params) // o.k
 	if(!_rooms[params[0]].isin(user.nickname()))
 		user.send_err(ERR_NOTONCHANNEL(user.nickname(), params[0]));
 
-	_rooms[params[0]].send_msg(_users, ":" + user.nickname() + " PART " + _rooms[params[0]].name() + "\n");
+	_rooms[params[0]].send_msg(_users, user.fullname() + " PART " + _rooms[params[0]].name() + "\n");
 	_rooms[params[0]].part(user, _rooms);
 }
 
