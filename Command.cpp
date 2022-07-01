@@ -177,7 +177,7 @@ void	Server::cmd_join(User &user, std::vector<std::string> &params) // o.k
 		if (_rooms[params[0]].users().size() > 10)
 			user.send_err(ERR_CHANNELISFULL(user.nickname(), _rooms[params[0]].name()));
 		_rooms[params[0]].join(user);
-		_rooms[params[0]].send_msg(_users, user.nickname(), user.fullname() + " JOIN " + params[0] + "\n", true);
+		_rooms[params[0]].send_msg(_users, user.fullname() + " JOIN " + params[0] + "\n");
 		if (_rooms[params[0]].topic() == "")
 			user.send_msg(RPL_NOTOPIC(user.nickname(), _rooms[params[0]].name()));
 		else
@@ -246,7 +246,7 @@ void	Server::cmd_part(User &user, std::vector<std::string> &params) // o.k
 	if(!_rooms[params[0]].isin(user.nickname()))
 		user.send_err(ERR_NOTONCHANNEL(user.nickname(), params[0]));
 
-	_rooms[params[0]].send_msg(_users, user.nickname(), ":" + user.nickname() + " PART " + _rooms[params[0]].name() + "\n");
+	_rooms[params[0]].send_msg(_users, ":" + user.nickname() + " PART " + _rooms[params[0]].name() + "\n");
 	_rooms[params[0]].part(user, _rooms);
 }
 
@@ -342,8 +342,8 @@ void	Server::cmd_topic(User &user, std::vector<std::string> &params)
 		if (!_rooms[params[0]].is_operator(user.nickname()))
 			user.send_err(ERR_CHANOPRIVSNEEDED(user.nickname(), params[0]));
 		_rooms[params[0]].set_topic(params[1]);
-		_rooms[params[0]].send_msg(_users, user.nickname(), RPL_SETTOPIC(params[0], params[1]));
-		_rooms[params[0]].send_msg(_users, user.nickname(), RPL_TOPIC(user.nickname(), params[0], _rooms[params[0]].topic()));
+		_rooms[params[0]].send_msg(_users, RPL_SETTOPIC(params[0], params[1]));
+		_rooms[params[0]].send_msg(_users, RPL_TOPIC(user.nickname(), params[0], _rooms[params[0]].topic()));
 	}
 }
 
