@@ -89,6 +89,11 @@ string Room::user_list(void) const
 {
 	string ret;
 	for (set<string>::iterator itr = _users.begin(); itr != _users.end(); ++itr)
+	{
+		if (itr == _users.begin())
+			ret += "@";
 		ret += *itr + " ";
+	}
+
 	return ret;
 }
