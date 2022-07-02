@@ -90,7 +90,7 @@ void	Server::cmd_nick(User &user, std::vector<std::string> &params)
 	{
 		_users[params[0]] = user;
 		_users[params[0]].set_nickname(params[0]);
-		_users.erase(user.nickname());
+		_users.erase(_users.begin());
 		_nicks[_users[params[0]].fd()] = params[0];
 		if (_users[params[0]].nickname().size() > 0 && _users[params[0]].username().size() > 0)
 		{

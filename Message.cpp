@@ -23,7 +23,7 @@ void	Message::setup(std::string message)
 void	Message::parse_prefix(std::string message, int &i)
 {
 	i = 1;
-	while (message[i] != '\r' && message[i] != ' ')
+	while ((message[i] != '\r' && message[i] !=  '\n')  && message[i] != ' ')
 		i++;
 	if (i > 1)
 		_prefix.append(&message[1], i - 1);
@@ -35,7 +35,7 @@ void	Message::parse_command(std::string message, int &i)
 {
 	int	j = i;
 
-	while (message[i] != '\r' && message[i] != ' ')
+	while ((message[i] != '\r' && message[i] !=  '\n') && message[i] != ' ')
 		i++;
 	if (i > j)
 		_command.append(&message[j], i - j);
@@ -48,22 +48,20 @@ void	Message::parse_params(std::string message, int &i)
 	int			j;
 	std::string	s;
 
-	while (message[i] != '\r')
+	while ((message[i] != '\r' && message[i] != '\n'))
 	{
 		while (message[i] == ' ')
 			i++;
 		j = i;
-
 		if (message[i] == ':') // param이 message일 경우
 		{
 			j++;
-			while (message[i] != '\r')
+			while (message[i] != '\r' && message[i] !=  '\n')
 				i++;
 			_params.push_back(s.append(&message[j], i - j));
 			return ;
 		}
-
-		while (message[i] != '\r' && message[i] != ' ')
+		while ((message[i] != '\r' && message[i] !=  '\n') && message[i] != ' ')
 			i++;
 		if (i > j)
 			_params.push_back(s.append(&message[j], i - j));
